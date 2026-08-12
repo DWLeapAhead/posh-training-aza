@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>POSH Training System - Setup & Usage Guide</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            color: #667eea;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 15px;
+            margin-bottom: 30px;
+            font-size: 32px;
+        }
+
+        h2 {
+            color: #764ba2;
+            margin-top: 35px;
+            margin-bottom: 15px;
+            font-size: 24px;
+            border-left: 4px solid #764ba2;
+            padding-left: 15px;
+        }
+
+        h3 {
+            color: #667eea;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+
+        p {
+            margin-bottom: 15px;
+            color: #555;
+        }
+
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .system-overview {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .system-box {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            border: 2px solid #667eea;
+        }
+
+        .system-box.backend {
+            border-color: #EF4444;
+        }
+
+        .system-box h3 {
+            margin-top: 0;
+            padding-bottom: 10px;
+            border-bottom: 2px solid;
+        }
+
+        .system-box.admin h3 {
+            border-bottom-color: #667eea;
+            color: #667eea;
+        }
+
+        .system-box.backend h3 {
+            border-bottom-color: #EF4444;
+            color: #EF4444;
+        }
+
+        .file-list {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+
+        .file-item {
+            padding: 12px;
+            margin: 8px 0;
+            background: #f0f0f0;
+            border-radius: 6px;
+            border-left: 4px solid #667eea;
+            font-family: 'Courier New', monospace;
+        }
+
+        .credentials {
+            background: #FFF3CD;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #F59E0B;
+            margin: 20px 0;
+        }
+
+        .credentials h4 {
+            color: #856404;
+            margin-bottom: 12px;
+        }
+
+        .cred-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
+
+        .cred-row:last-child {
+            border-bottom: none;
+        }
+
+        .cred-label {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .cred-value {
+            background: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        ul, ol {
+            margin-left: 20px;
+            margin-bottom: 15px;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        .feature-list {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+
+        .feature-item {
+            padding: 12px;
+            background: white;
+            border-radius: 6px;
+            border-left: 4px solid #10B981;
+            display: flex;
+            gap: 12px;
+        }
+
+        .feature-icon {
+            font-size: 20px;
+            min-width: 30px;
+        }
+
+        .feature-text {
+            font-size: 14px;
+            color: #555;
+        }
+
+        .warning-box {
+            background: #FEE2E2;
+            border-left: 4px solid #EF4444;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 15px 0;
+            color: #991B1B;
+        }
+
+        .info-box {
+            background: #DBEAFE;
+            border-left: 4px solid #0284C7;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 15px 0;
+            color: #0C4A6E;
+        }
+
+        .success-box {
+            background: #ECFDF5;
+            border-left: 4px solid #10B981;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 15px 0;
+            color: #065F46;
+        }
+
+        .flow-diagram {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            border: 2px dashed #667eea;
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.8;
+            overflow-x: auto;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+
+        .comparison-table th,
+        .comparison-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .comparison-table th {
+            background: #667eea;
+            color: white;
+            font-weight: 600;
+        }
+
+        .comparison-table tr:hover {
+            background: #f9f9f9;
+        }
+
+        .footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 2px solid #ddd;
+            color: #999;
+            font-size: 12px;
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .system-overview {
+                grid-template-columns: 1fr;
+            }
+
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+
+            h2 {
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🛡️ POSH Training System - Complete Setup Guide</h1>
+
+        <!-- Overview -->
+        <div class="section">
+            <h2>📋 System Overview</h2>
+            <p>The POSH Training System consists of three integrated components:</p>
+            
+            <div class="system-overview">
+                <div class="system-box admin">
+                    <h3>1️⃣ Training Module</h3>
+                    <p>Interactive training platform for employees to complete the POSH awareness program with quizzes and acknowledgements.</p>
+                    <strong>File:</strong> POSH_Training_With_Intro_Page.html
+                </div>
+                <div class="system-box admin">
+                    <h3>2️⃣ Admin Dashboard</h3>
+                    <p>Tracks training completions, quiz performance, and overall program metrics for analytics.</p>
+                    <strong>File:</strong> POSH_Admin_Dashboard.html
+                </div>
+                <div class="system-box backend">
+                    <h3>3️⃣ Backend Dashboard</h3>
+                    <p>Secure admin-only access to view detailed employee responses and acknowledgement data.</p>
+                    <strong>File:</strong> POSH_Backend_Dashboard.html
+                </div>
+            </div>
+        </div>
+
+        <!-- Files Section -->
+        <div class="section">
+            <h2>📂 Required Files</h2>
+            <p>Deploy all three files on your web server or hosting platform:</p>
+            
+            <div class="file-list">
+                <div class="file-item">✓ POSH_Training_With_Intro_Page.html</div>
+                <div class="file-item">✓ POSH_Admin_Dashboard.html</div>
+                <div class="file-item">✓ POSH_Backend_Dashboard.html</div>
+            </div>
+
+            <div class="info-box">
+                <strong>💡 Tip:</strong> Place all files in the same directory for proper functionality. Each file operates independently but shares data via browser localStorage.
+            </div>
+        </div>
+
+        <!-- Credentials Section -->
+        <div class="section">
+            <h2>🔐 Access Credentials</h2>
+
+            <h3>Admin Dashboard (Completion Tracking)</h3>
+            <div class="credentials">
+                <h4>Login Details</h4>
+                <div class="cred-row">
+                    <span class="cred-label">Password:</span>
+                    <span class="cred-value">Aza@Admin2026</span>
+                </div>
+            </div>
+
+            <h3>Backend Dashboard (Employee Responses) - ADMIN ONLY</h3>
+            <div class="credentials">
+                <h4>⚠️ IMPORTANT: Change These Credentials Before Going Live</h4>
+                <div class="cred-row">
+                    <span class="cred-label">Email:</span>
+                    <span class="cred-value">admin@azafashions.com</span>
+                </div>
+                <div class="cred-row">
+                    <span class="cred-label">Password:</span>
+                    <span class="cred-value">BackendAccess@2026</span>
+                </div>
+            </div>
+
+            <div class="warning-box">
+                <strong>⚠️ Security Alert:</strong> The Backend Dashboard credentials MUST be changed immediately in the HTML file before deploying to production. Edit line 468-469 in POSH_Backend_Dashboard.html with your secure credentials.
+            </div>
+        </div>
+
+        <!-- Deployment URLs -->
+        <div class="section">
+            <h2>🌐 Deployment & Access URLs</h2>
+
+            <h3>1. Training Module (for Employees)</h3>
+            <div class="flow-diagram">
+                https://your-domain.com/POSH_Training_With_Intro_Page.html
+                
+                → Employees access this link
+                → No login required
+                → Can be distributed via email
+            </div>
+
+            <h3>2. Admin Dashboard (Completion Tracking)</h3>
+            <div class="flow-diagram">
+                https://your-domain.com/POSH_Admin_Dashboard.html
+                
+                → Requires password: Aza@Admin2026
+                → Tracks: Completions, quiz scores, metrics
+                → For HR/Management analytics
+            </div>
+
+            <h3>3. Backend Dashboard (Responses - Admin Only)</h3>
+            <div class="flow-diagram">
+                https://your-domain.com/POSH_Backend_Dashboard.html
+                
+                → Requires Email + Password
+                → Access: admin@azafashions.com / BackendAccess@2026
+                → Shows: All employee responses, acknowledgements
+                → ONLY you should have access
+            </div>
+        </div>
+
+        <!-- How It Works -->
+        <div class="section">
+            <h2>⚙️ How the System Works</h2>
+
+            <h3>Data Flow</h3>
+            <div class="flow-diagram">
+Employee Completes Training
+          ↓
+Fills Acknowledgement Form
+          ↓
+Data Saved to Browser localStorage
+          ↓
+Admin Dashboard Reads & Displays Metrics
+          ↓
+Backend Dashboard Shows Detailed Responses
+            </div>
+
+            <h3>Data Saved for Each Employee</h3>
+            <ul>
+                <li><strong>Personal Information:</strong> Name, Employee ID, Email, Department</li>
+                <li><strong>Training Progress:</strong> Completion date, time, quiz scores</li>
+                <li><strong>Acknowledgements:</strong> All 5 consent checkboxes status</li>
+                <li><strong>Verification:</strong> Unique completion ID and verification code</li>
+                <li><strong>Metrics:</strong> Number of quizzes completed</li>
+            </ul>
+        </div>
+
+        <!-- Feature Comparison -->
+        <div class="section">
+            <h2>🔄 Dashboard Comparison</h2>
+
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Feature</th>
+                        <th>Admin Dashboard</th>
+                        <th>Backend Dashboard</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Purpose</strong></td>
+                        <td>Completion tracking & metrics</td>
+                        <td>Detailed employee responses</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Login Type</strong></td>
+                        <td>Password only</td>
+                        <td>Email + Password (more secure)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Views Data</strong></td>
+                        <td>Summary statistics</td>
+                        <td>Individual employee details</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Shows Names</strong></td>
+                        <td>Yes (completion summary)</td>
+                        <td>Yes (all response data)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Shows Acknowledgements</strong></td>
+                        <td>No</td>
+                        <td>Yes (all 5 checkboxes)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Export Data</strong></td>
+                        <td>CSV export available</td>
+                        <td>CSV export available</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Search Function</strong></td>
+                        <td>Yes</td>
+                        <td>Yes</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Access Level</strong></td>
+                        <td>Anyone with password</td>
+                        <td>Only designated admin</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Employee Training Flow -->
+        <div class="section">
+            <h2>👥 Employee Training Flow</h2>
+
+            <h3>Quiz Rules (Mandatory Correct Answers)</h3>
+            <ul>
+                <li><strong>Slide 7 (Quiz 1):</strong> Wrong answer → Redirects to Slide 0 (start over)</li>
+                <li><strong>Slide 10 (Quiz 2):</strong> Wrong answer → Redirects to Slide 9 (review content)</li>
+                <li><strong>Slide 15 (Quiz 3):</strong> Wrong answer → Redirects to Slide 12 (review content)</li>
+            </ul>
+
+            <h3>Acknowledgement Form (Slide 17)</h3>
+            <p>Before completion, employees MUST:</p>
+            <ul>
+                <li>✓ Read and understand POSH Policy</li>
+                <li>✓ Acknowledge rights and responsibilities</li>
+                <li>✓ Confirm reporting procedures knowledge</li>
+                <li>✓ Agree to confidentiality</li>
+                <li>✓ Confirm POSH Act compliance</li>
+                <li>✓ Fill in complete personal information</li>
+            </ul>
+
+            <div class="success-box">
+                <strong>✅ Upon Completion:</strong> Employee receives a completion certificate with unique ID and verification code for records.
+            </div>
+        </div>
+
+        <!-- Admin Dashboard Features -->
+        <div class="section">
+            <h2>📊 Admin Dashboard Features</h2>
+
+            <h3>Statistics Displayed</h3>
+            <div class="feature-list">
+                <div class="feature-item">
+                    <div class="feature-icon">📈</div>
+                    <div class="feature-text"><strong>Total Completions:</strong> Count of employees who finished training</div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">📊</div>
+                    <div class="feature-text"><strong>Completion Rate:</strong> Percentage based on expected participants</div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">🎯</div>
+                    <div class="feature-text"><strong>Average Quiz Score:</strong> Performance across all employees</div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">⭐</div>
+                    <div class="feature-text"><strong>Perfect Scores:</strong> Count of employees with 3/3 quizzes correct</div>
+                </div>
+            </div>
+
+            <h3>Admin Dashboard Capabilities</h3>
+            <ul>
+                <li>View real-time completion data</li>
+                <li>Search by employee name, email, or ID</li>
+                <li>View individual employee details</li>
+                <li>Export data as CSV for compliance</li>
+                <li>Track quiz performance</li>
+                <li>Monitor completion deadlines</li>
+            </ul>
+        </div>
+
+        <!-- Backend Dashboard Features -->
+        <div class="section">
+            <h2>🔐 Backend Dashboard Features</h2>
+
+            <div class="warning-box">
+                <strong>⚠️ ADMIN ONLY:</strong> This dashboard contains sensitive employee response data. Only authorized administrators should have access credentials.
+            </div>
+
+            <h3>Data Available in Backend Dashboard</h3>
+            <div class="feature-list">
+                <div class="feature-item">
+                    <div class="feature-icon">👤</div>
+                    <div class="feature-text"><strong>Employee Information:</strong> Full name, ID, email, department</div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">✅</div>
+                    <div class="feature-text"><strong>Acknowledgement Status:</strong> All 5 consent checkboxes (checked/unchecked)</div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">📝</div>
+                    <div class="feature-text"><strong>Quiz Performance:</strong> Number of quizzes completed correctly</div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">⏰</div>
+                    <div class="feature-text"><strong>Timestamps:</strong> Exact date and time of completion</div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">🔑</div>
+                    <div class="feature-text"><strong>Verification Codes:</strong> Unique completion and verification IDs</div>
+                </div>
+            </div>
+
+            <h3>Backend Dashboard Capabilities</h3>
+            <ul>
+                <li>Dual authentication (email + password)</li>
+                <li>View detailed employee responses</li>
+                <li>See all acknowledgement status</li>
+                <li>Search by name, email, or employee ID</li>
+                <li>Export employee data as CSV</li>
+                <li>Refresh data in real-time</li>
+                <li>Secure logout functionality</li>
+            </ul>
+        </div>
+
+        <!-- Setup Instructions -->
+        <div class="section">
+            <h2>🚀 Setup Instructions</h2>
+
+            <h3>Step 1: Prepare the Files</h3>
+            <ol>
+                <li>Download all three HTML files from outputs</li>
+                <li>Keep all files in the same directory</li>
+                <li>Do NOT rename the files</li>
+            </ol>
+
+            <h3>Step 2: Change Backend Credentials (CRITICAL)</h3>
+            <ol>
+                <li>Open POSH_Backend_Dashboard.html in a text editor</li>
+                <li>Find line 468-469 with these lines:
+                    <div style="background: #f0f0f0; padding: 10px; margin: 10px 0; border-radius: 4px; font-family: monospace;">
+                        const ADMIN_EMAIL = 'admin@azafashions.com';<br>
+                        const ADMIN_PASSWORD = 'BackendAccess@2026';
+                    </div>
+                </li>
+                <li>Replace with your secure credentials:
+                    <div style="background: #f0f0f0; padding: 10px; margin: 10px 0; border-radius: 4px; font-family: monospace;">
+                        const ADMIN_EMAIL = 'your.email@azafashions.com';<br>
+                        const ADMIN_PASSWORD = 'YourSecurePassword123!';
+                    </div>
+                </li>
+                <li>Save the file</li>
+            </ol>
+
+            <h3>Step 3: Optional - Change Admin Dashboard Password</h3>
+            <ol>
+                <li>Open POSH_Admin_Dashboard.html in a text editor</li>
+                <li>Find line 491 with:
+                    <div style="background: #f0f0f0; padding: 10px; margin: 10px 0; border-radius: 4px; font-family: monospace;">
+                        const ADMIN_PASSWORD = 'Aza@Admin2026';
+                    </div>
+                </li>
+                <li>Change to your preferred password</li>
+                <li>Save the file</li>
+            </ol>
+
+            <h3>Step 4: Deploy Files</h3>
+            <ol>
+                <li>Upload all three HTML files to your web server</li>
+                <li>Ensure files are accessible via HTTPS (not HTTP)</li>
+                <li>Test each file by opening in browser</li>
+            </ol>
+
+            <h3>Step 5: Distribute Training Link</h3>
+            <ol>
+                <li>Share the Training Module link with employees</li>
+                <li>Set a completion deadline (e.g., 26th August 2026)</li>
+                <li>Employees complete training at their own pace</li>
+            </ol>
+
+            <h3>Step 6: Monitor Progress</h3>
+            <ol>
+                <li>Use Admin Dashboard for completion tracking</li>
+                <li>Use Backend Dashboard for detailed employee responses</li>
+                <li>Export data regularly for compliance records</li>
+            </ol>
+        </div>
+
+        <!-- Important Notes -->
+        <div class="section">
+            <h2>⚠️ Important Considerations</h2>
+
+            <div class="warning-box">
+                <strong>🔒 Security:</strong> All data is stored in browser's localStorage. For production, consider implementing server-side storage for better security.
+            </div>
+
+            <div class="info-box">
+                <strong>💾 Data Backup:</strong> Regularly export data from both dashboards to backup sensitive employee responses.
+            </div>
+
+            <div class="info-box">
+                <strong>🔐 Password Management:</strong> Use strong, unique passwords for Backend Dashboard. Change credentials periodically.
+            </div>
+
+            <div class="info-box">
+                <strong>📱 Mobile Support:</strong> All three systems are mobile-responsive and work on tablets and smartphones.
+            </div>
+
+            <div class="info-box">
+                <strong>🌐 Browser Compatibility:</strong> Works on Chrome, Firefox, Safari, and Edge browsers.
+            </div>
+        </div>
+
+        <!-- Troubleshooting -->
+        <div class="section">
+            <h2>🔧 Troubleshooting</h2>
+
+            <h3>Q: Employee data is not showing in dashboards?</h3>
+            <p>A: Ensure employees have completed the full training and filled the acknowledgement form. Data is saved only after full completion on Slide 18.</p>
+
+            <h3>Q: Backend Dashboard login not working?</h3>
+            <p>A: Verify you are using the correct email and password. Check that you haven't accidentally used single/double quotes in credentials. Re-enter carefully.</p>
+
+            <h3>Q: Data disappeared from dashboard?</h3>
+            <p>A: LocalStorage data clears when browser cache is cleared. Export data regularly to prevent loss.</p>
+
+            <h3>Q: Can I change quiz questions after training starts?</h3>
+            <p>A: No. Editing quiz questions after deployment may affect employees' ability to proceed. Finalize questions before going live.</p>
+
+            <h3>Q: How to give another admin access to Backend?</h3>
+            <p>A: You must change the ADMIN_EMAIL and ADMIN_PASSWORD in the HTML file and give them the new credentials. Only one set of credentials is supported per file.</p>
+
+            <h3>Q: Can employees retake the training?</h3>
+            <p>A: Yes. Employees can return and complete again. Each completion creates a new entry with a new unique ID.</p>
+        </div>
+
+        <!-- Support & Contact -->
+        <div class="section">
+            <h2>📧 Support Information</h2>
+
+            <p><strong>For Employee Training Issues:</strong></p>
+            <ul>
+                <li>Email: complaintscommittee@azafashions.com</li>
+                <li>Contact: Human Resources Department</li>
+                <li>For POSH policy questions: Internal Committee</li>
+            </ul>
+
+            <p><strong>System Deadline:</strong> 26th August 2026</p>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>© 2026 Aza Fashions Private Limited | POSH Training System Setup Guide</p>
+            <p>Last Updated: August 12, 2026</p>
+        </div>
+    </div>
+</body>
+</html>
