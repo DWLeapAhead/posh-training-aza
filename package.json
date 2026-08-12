@@ -1,0 +1,71 @@
+{
+  "name": "posh-training",
+  "version": "1.0.0",
+  "description": "POSH (Prevention of Sexual Harassment) Training System - Aza Fashions",
+  "keywords": [
+    "posh",
+    "training",
+    "compliance",
+    "harassment-prevention",
+    "corporate-training",
+    "aza-fashions"
+  ],
+  "author": "Aza Fashions Private Limited",
+  "license": "Proprietary",
+  "homepage": "https://posh-training-virid.vercel.app",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/DWLeapAhead/posh-training.git"
+  },
+  "scripts": {
+    "dev": "echo 'Open public/index.html in browser'",
+    "build": "echo 'Static files ready'",
+    "test": "echo 'Manual testing recommended'",
+    "start": "echo 'Visit https://posh-training-virid.vercel.app'"
+  },
+  "private": true,
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "directories": {
+    "public": "public"
+  },
+  "files": [
+    "public",
+    "vercel.json",
+    "README.md"
+  ],
+  "configuration": {
+    "deployment": "Vercel",
+    "framework": "Static HTML",
+    "storage": "Browser LocalStorage",
+    "compliance": "POSH Act 2013"
+  },
+  "features": {
+    "training": "18-slide interactive module",
+    "quizzes": 3,
+    "acknowledgements": 5,
+    "dashboards": [
+      "Admin Dashboard",
+      "Backend Dashboard"
+    ],
+    "export": "CSV"
+  },
+  "credentials": {
+    "adminDashboard": {
+      "password": "Aza@Admin2026",
+      "note": "Change before production"
+    },
+    "backendDashboard": {
+      "email": "admin@azafashions.com",
+      "password": "BackendAccess@2026",
+      "note": "Change before production - ADMIN ONLY"
+    }
+  },
+  "deadline": "26th August 2026",
+  "contact": {
+    "support": "complaintscommittee@azafashions.com",
+    "department": "Human Resources",
+    "company": "Aza Fashions Private Limited"
+  }
+}
