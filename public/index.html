@@ -62,6 +62,16 @@
         .header h1 {
             font-size: 24px;
             font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin: 0;
+        }
+
+        .header-logo {
+            height: 50px;
+            width: auto;
+            max-width: 80px;
         }
 
         .progress-container {
@@ -813,7 +823,10 @@
     <div class="container">
         <!-- Header with Progress -->
         <div class="header">
-            <h1>🛡️ POSH Training - Aza Fashions</h1>
+            <h1>
+                <img src="/assets/aza-logo.png" alt="Aza Fashions Logo" class="header-logo">
+                POSH Training
+            </h1>
             <div class="progress-container">
                 <div class="progress-bar">
                     <div class="progress-fill" id="progressFill"></div>
