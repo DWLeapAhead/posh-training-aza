@@ -4,6 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>POSH Training Backend - Admin Only</title>
+    
+    <!-- Firebase SDK -->
+    <!-- Firebase SDK (Compat Version for Global API) -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+    
     <style>
         * {
             margin: 0;
@@ -603,6 +609,28 @@
     </div>
 
     <script>
+        // ===== FIREBASE INITIALIZATION =====
+        // IMPORTANT: Replace firebaseConfig with your Firebase project config
+        const firebaseConfig = {
+          apiKey: "AIzaSyCvhE7nQYWjByTNEYix6bVmOG4ThAkeaow",
+          authDomain: "posh-training-aza.firebaseapp.com",
+          databaseURL: "https://posh-training-aza-default-rtdb.asia-southeast1.firebasedatabase.app",
+          projectId: "posh-training-aza",
+          storageBucket: "posh-training-aza.appspot.com",
+          messagingSenderId: "357471800084",
+          appId: "1:357471800084:web:f2da53537d6758b040d001"
+        };
+
+        try {
+            firebase.initializeApp(firebaseConfig);
+            window.firebaseDatabase = firebase.database();
+            console.log('✅ Firebase initialized successfully');
+        } catch (error) {
+            console.error('❌ Firebase initialization error:', error);
+            console.log('⚠️ Will use localStorage fallback');
+        }
+        // ===== END FIREBASE INITIALIZATION =====
+
         // Backend Admin Credentials (CHANGE THIS TO YOUR CREDENTIALS)
         const ADMIN_EMAIL = 'admin@azafashions.com';
         const ADMIN_PASSWORD = 'BackendAccess@2026';
@@ -665,8 +693,47 @@
             document.getElementById('backendSearchBox').addEventListener('keyup', filterResponses);
         });
 
-        // Load all employee response data
+        // Load all employee response data from Firebase
         function loadBackendData() {
+            if (window.firebaseDatabase) {
+                try {
+                    const completionsRef = window.firebaseDatabase.ref('completions');
+                    completionsRef.once('value').then((snapshot) => {
+                        allResponses = [];
+                        if (snapshot.exists()) {
+                            snapshot.forEach((childSnapshot) => {
+                                allResponses.push(childSnapshot.val());
+                            });
+                            console.log('✅ Loaded', allResponses.length, 'responses from Firebase');
+                        } else {
+                            console.log('ℹ️ No completions found in Firebase');
+                        }
+
+                        if (allResponses.length === 0) {
+                            displayEmptyState();
+                            updateStats();
+                            return;
+                        }
+
+                        filteredResponses = [...allResponses];
+                        displayResponsesTable();
+                        updateStats();
+                    }).catch((error) => {
+                        console.error('❌ Firebase read error:', error);
+                        loadBackendDataFallback();
+                    });
+                } catch (error) {
+                    console.error('❌ Error loading backend data from Firebase:', error);
+                    loadBackendDataFallback();
+                }
+            } else {
+                loadBackendDataFallback();
+            }
+        }
+
+        // Fallback to localStorage
+        function loadBackendDataFallback() {
+            console.log('⚠️ Using localStorage fallback for data');
             try {
                 allResponses = JSON.parse(localStorage.getItem('posh_completions') || '[]');
                 
@@ -680,7 +747,7 @@
                 displayResponsesTable();
                 updateStats();
             } catch (error) {
-                console.error('Error loading backend data:', error);
+                console.error('Error loading backend data from localStorage:', error);
                 displayEmptyState();
             }
         }
