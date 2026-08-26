@@ -805,6 +805,9 @@
             }
         }
     </style>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js"></script>
 </head>
 <body>
     <div class="container">
@@ -1513,6 +1516,28 @@
     </audio>
 
     <script>
+        // ============ FIREBASE CONFIGURATION ============
+        const firebaseConfig = {
+          apiKey: "AIzaSyCvhE7nQYWjByTNEYix6bVmOG4ThAkeaow",
+          authDomain: "posh-training-aza.firebaseapp.com",
+          databaseURL: "https://posh-training-aza-default-rtdb.asia-southeast1.firebasedatabase.app",
+          projectId: "posh-training-aza",
+          storageBucket: "posh-training-aza.appspot.com",
+          messagingSenderId: "357471800084",
+          appId: "1:357471800084:web:f2da53537d6758b040d001"
+        };
+
+        // Initialize Firebase
+        let firebaseDatabase = null;
+        try {
+            firebase.initializeApp(firebaseConfig);
+            firebaseDatabase = firebase.database();
+            console.log('✅ Firebase initialized successfully');
+        } catch (error) {
+            console.warn('⚠️ Firebase initialization warning:', error.message);
+        }
+        // ============ END FIREBASE CONFIG ============
+
         const slides = document.querySelectorAll('.slide');
         const content = document.getElementById('content');
         const nextBtn = document.getElementById('nextBtn');
@@ -1960,20 +1985,71 @@
             bgMusic.pause();
         }
 
-        // Completion data persistence
+        // Completion data persistence - Firebase + localStorage fallback
         function saveCompletionData(data) {
+            const timestamp = Date.now();
+            const dataKey = `${data.empID}_${timestamp}`;
+            
+            // Try Firebase first
+            if (firebaseDatabase) {
+                try {
+                    firebaseDatabase.ref('completions/' + dataKey).set(data)
+                        .then(() => {
+                            console.log('✅ Data saved to Firebase successfully');
+                        })
+                        .catch((error) => {
+                            console.warn('⚠️ Firebase write failed:', error.message);
+                            console.log('💾 Saving to localStorage as fallback');
+                            saveTolocalStorageFallback(data);
+                        });
+                } catch (error) {
+                    console.warn('⚠️ Firebase error:', error.message);
+                    saveTolocalStorageFallback(data);
+                }
+            } else {
+                console.log('💾 Firebase not available, using localStorage');
+                saveTolocalStorageFallback(data);
+            }
+        }
+
+        // Fallback function to save to localStorage
+        function saveTolocalStorageFallback(data) {
             const allCompletions = JSON.parse(localStorage.getItem('posh_completions') || '[]');
             allCompletions.push(data);
             localStorage.setItem('posh_completions', JSON.stringify(allCompletions));
-            
-            // Also save the latest
             localStorage.setItem('posh_latest_completion', JSON.stringify(data));
+            console.log('✅ Data saved to localStorage (fallback)');
         }
 
         function loadCompletionData() {
+            // Try Firebase first
+            if (firebaseDatabase) {
+                try {
+                    firebaseDatabase.ref('completions').once('value')
+                        .then((snapshot) => {
+                            if (snapshot.exists()) {
+                                const allData = snapshot.val();
+                                console.log('✅ Completion data loaded from Firebase:', allData);
+                            }
+                        })
+                        .catch((error) => {
+                            console.warn('⚠️ Firebase read failed:', error.message);
+                            loadFromlocalStorageFallback();
+                        });
+                } catch (error) {
+                    console.warn('⚠️ Firebase error:', error.message);
+                    loadFromlocalStorageFallback();
+                }
+            } else {
+                loadFromlocalStorageFallback();
+            }
+        }
+
+        // Fallback function to load from localStorage
+        function loadFromlocalStorageFallback() {
             const latest = localStorage.getItem('posh_latest_completion');
             if (latest) {
-                console.log('Previous training completion found:', JSON.parse(latest));
+                console.log('Previous training completion found (from localStorage):', JSON.parse(latest));
             }
         }
 
