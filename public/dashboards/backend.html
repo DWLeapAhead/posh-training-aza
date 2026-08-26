@@ -72,6 +72,16 @@
             font-size: 32px;
             color: var(--primary);
             margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .login-header-logo {
+            height: 45px;
+            width: auto;
+            max-width: 70px;
         }
 
         .login-header p {
@@ -166,9 +176,22 @@
             gap: 20px;
         }
 
+        .backend-header > div:first-child {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .backend-header-logo {
+            height: 50px;
+            width: auto;
+            max-width: 80px;
+        }
+
         .backend-header h1 {
             font-size: 32px;
             color: var(--primary);
+            margin: 0;
         }
 
         .backend-header p {
@@ -518,7 +541,10 @@
     <div class="login-wrapper" id="loginWrapper">
         <div class="login-card">
             <div class="login-header">
-                <h1>🔒 Backend Admin</h1>
+                <h1>
+                    <img src="/assets/aza-logo.png" alt="Aza Fashions Logo" class="login-header-logo">
+                    Backend Admin
+                </h1>
                 <p>POSH Training - Employee Responses</p>
             </div>
             <div class="login-form">
@@ -543,8 +569,11 @@
     <div class="backend-wrapper" id="backend">
         <div class="backend-header">
             <div>
-                <h1>📊 POSH Training Backend</h1>
-                <p>Employee Responses & Analytics</p>
+                <img src="/assets/aza-logo.png" alt="Aza Fashions Logo" class="backend-header-logo">
+                <div>
+                    <h1>POSH Training Backend</h1>
+                    <p>Employee Responses & Analytics</p>
+                </div>
             </div>
             <div class="header-actions">
                 <button class="btn btn-secondary" onclick="refreshBackendData()">🔄 Refresh</button>
@@ -633,7 +662,7 @@
 
         // Backend Admin Credentials (CHANGE THIS TO YOUR CREDENTIALS)
         const ADMIN_EMAIL = 'admin@azafashions.com';
-        const ADMIN_PASSWORD = 'BackendPOSHAZA@2026';
+        const ADMIN_PASSWORD = 'BackendAccess@2026';
 
         let allResponses = [];
         let filteredResponses = [];
