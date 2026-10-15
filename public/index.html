@@ -424,9 +424,21 @@
             font-weight: 600;
             color: var(--text-dark);
             margin-bottom: 25px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            display: block;
+            line-height: 1.6;
+            text-align: left;
+        }
+
+        .quiz-question > span {
+            display: inline-block;
+            margin-right: 10px;
+        }
+
+        .quiz-followup {
+            display: block;
+            margin-top: 12px;
+            font-weight: 400;
+            text-align: left;
         }
 
         .quiz-options {
@@ -918,15 +930,15 @@
                                 <span style="color: #10B981; font-size: 18px; font-weight: bold;">✓</span>
                                 <span style="color: var(--text-dark);">Summary & Key Takeaways</span>
                             </div>
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <span style="color: #10B981; font-size: 18px; font-weight: bold;">✓</span>
+                                <span style="color: var(--text-dark);">POSH Scenario based questions</span>
+                            </div>
                         </div>
                     </div>
 
                     <!-- Deadline -->
-                    <div style="background: linear-gradient(135deg, #FEF3C7 0%, #FED7AA 100%); border-left: 4px solid #D97706; padding: 15px 20px; border-radius: 8px; animation: slideInUp 0.6s ease 0.4s forwards; opacity: 0;">
-                        <p style="margin: 0; color: #92400E; font-weight: 600; font-size: 16px;">
-                            ⏰ Completion Deadline: 26th August 2026
-                        </p>
-                    </div>
+
 
 
 
@@ -1481,6 +1493,168 @@
                 </div>
             </div>
 
+            <!-- 18. POSH Scenario-Based Assessment -->
+            <div class="slide" id="scenarioAssessmentSlide">
+                <div class="slide-title">📝 POSH Scenario-Based Assessment</div>
+                <div class="slide-subtitle">Please read each scenario carefully and select the most appropriate option. We encourage everyone to think through each situation and choose the answer that best reflects their understanding of POSH guidelines and appropriate workplace behaviour. Your responses will help assess your understanding of the concepts covered in this training.</div>
+                <div class="quiz-container">
+                    <div class="quiz-question"><span>❓</span>During a team celebration, a senior colleague frequently places his hand on a junior employee's shoulder while speaking to her. He does this several times during the evening. She appears uncomfortable but does not say anything or ask him to stop.</div>
+                    <div class="quiz-options" id="scenarioAssessmentOptions">
+                        <div class="quiz-option" data-option="A">A. It would not be harassment unless she explicitly told him that the contact was unwelcome.</div>
+                        <div class="quiz-option" data-option="B">B. It is acceptable because physical contact at celebrations is generally considered informal behavior.</div>
+                        <div class="quiz-option" data-option="C">C. It would only become harassment if the colleague made a sexually suggestive comment at the same time.</div>
+                        <div class="quiz-option" data-option="D" data-correct="true">D. It may constitute harassment because repeated, unwanted physical contact can be inappropriate even when the employee does not verbally object.</div>
+                    </div>
+                    <div class="feedback-message" id="scenarioAssessmentFeedback" role="status" aria-live="polite"></div>
+                </div>
+            </div>
+
+
+            <!-- 19. POSH Scenario-Based Assessment - Question 2 -->
+            <div class="slide" id="scenarioAssessmentSlide2">
+                <div class="slide-title">📝 POSH Scenario-Based Assessment – Question 2</div>
+                <div class="slide-subtitle">Please read the scenario carefully and select the most appropriate option.</div>
+                <div class="quiz-container">
+                    <div class="quiz-question"><span>❓</span>A colleague asks another colleague once if she would like to meet for coffee outside work. She politely declines. He accepts the answer, does not ask again and continues to interact with her professionally.</div>
+                    <div class="quiz-options" id="scenarioAssessmentOptions2">
+                        <div class="quiz-option" data-option="A">A. It is harassment because the invitation involved a personal meeting.</div>
+                        <div class="quiz-option" data-option="B">B. It is harassment because romantic or personal invitations are never appropriate between colleagues.</div>
+                        <div class="quiz-option" data-option="C" data-correct="true">C. It is not harassment, a single respectful invitation that is accepted as declined, without pressure or repetition, would generally not constitute POSH.</div>
+                        <div class="quiz-option" data-option="D">D. It is harassment unless the invitation is made outside working hours.</div>
+                    </div>
+                    <div class="feedback-message" id="scenarioAssessmentFeedback2" role="status" aria-live="polite"></div>
+                </div>
+            </div>
+
+            <!-- 20. POSH Scenario-Based Assessment - Question 3 -->
+            <div class="slide" id="scenarioAssessmentSlide3">
+                <div class="slide-title">📝 POSH Scenario-Based Assessment – Question 3</div>
+                <div class="slide-subtitle">Please read the scenario carefully and select the most appropriate option.</div>
+                <div class="quiz-container">
+                    <div class="quiz-question"><span>❓</span>A manager gives an employee direct feedback about repeatedly missing deadlines during a private one-on-one conversation. The manager is firm but makes no personal, gender-based or sexual comments. The employee leaves the meeting upset.</div>
+                    <div class="quiz-options" id="scenarioAssessmentOptions3">
+                        <div class="quiz-option" data-option="A" data-correct="true">A. It is not sexual harassment. It is merely because the employee felt upset; legitimate, gender-neutral performance feedback.</div>
+                        <div class="quiz-option" data-option="B">B. It is harassment because the employee experienced discomfort.</div>
+                        <div class="quiz-option" data-option="C">C. It is harassment because the conversation happened privately.</div>
+                        <div class="quiz-option" data-option="D">D. It should be treated as harassment because the manager used a stern tone.</div>
+                    </div>
+                    <div class="feedback-message" id="scenarioAssessmentFeedback3" role="status" aria-live="polite"></div>
+                </div>
+            </div>
+
+            <!-- 21. POSH Scenario-Based Assessment - Question 4 -->
+            <div class="slide" id="scenarioAssessmentSlide4">
+                <div class="slide-title">📝 POSH Scenario-Based Assessment – Question 4</div>
+                <div class="slide-subtitle">Please read the scenario carefully and select the most appropriate option.</div>
+                <div class="quiz-container">
+                    <div class="quiz-question"><span>❓</span>An employee notices that a colleague repeatedly stares at her. She feels uncomfortable and asks him to stop, but he continues to do so after informing him repeated times. The colleague says he isn’t staring at her with sexual intent; he appears to be preoccupied with his work and is unaware that he is staring at her.</div>
+                    <div class="quiz-options" id="scenarioAssessmentOptions4">
+                        <div class="quiz-option" data-option="A">A. No, because the colleague has no sexual intent and is unaware that he is staring, his behaviour cannot be considered harassment.</div>
+                        <div class="quiz-option" data-option="B">B. Yes, any instance of staring at a colleague automatically constitutes sexual harassment, regardless of the circumstances or intent.</div>
+                        <div class="quiz-option" data-option="C" data-correct="true">C. Although the staring may be unintentional and non-sexual, continuing it after being asked to stop causes discomfort and disregards the colleague’s boundaries. The repeated conduct must be assessed in context to determine whether it meets the criteria for sexual harassment under POSH.</div>
+                        <div class="quiz-option" data-option="D">D. No, unless the colleague makes an explicit sexual comment or advances, repeated staring cannot be considered harassment.</div>
+                    </div>
+                    <div class="feedback-message" id="scenarioAssessmentFeedback4" role="status" aria-live="polite"></div>
+                </div>
+            </div>
+
+            <!-- 22. POSH Scenario-Based Assessment - Question 5 -->
+            <div class="slide" id="scenarioAssessmentSlide5">
+                <div class="slide-title">📝 POSH Scenario-Based Assessment – Question 5</div>
+                <div class="slide-subtitle">Please read the scenario carefully and select the most appropriate option.</div>
+                <div class="quiz-container">
+                    <div class="quiz-question"><span>❓</span>An employee declines a supervisor's repeated invitation to a personal dinner. A few days later, the supervisor tells her that her contract renewal is now “at risk.” The supervisor never explicitly says that the two events are connected.</div>
+                    <div class="quiz-options" id="scenarioAssessmentOptions5">
+                        <div class="quiz-option" data-option="A">A. There is no concern because the supervisor never directly linked the dinner invitation to the contract.</div>
+                        <div class="quiz-option" data-option="B" data-correct="true">B. It will constitute harassment because the sequence of events can indicate detrimental treatment following rejection of an unwelcome advance.</div>
+                        <div class="quiz-option" data-option="C">C. It would only be harassment if the contract was terminated.</div>
+                        <div class="quiz-option" data-option="D">D. It is a performance-management issue unless the employee can establish the supervisor's exact intention.</div>
+                    </div>
+                    <div class="feedback-message" id="scenarioAssessmentFeedback5" role="status" aria-live="polite"></div>
+                </div>
+            </div>
+
+            <!-- 23. POSH Scenario-Based Assessment - Question 6 -->
+            <div class="slide" id="scenarioAssessmentSlide6">
+                <div class="slide-title">📝 POSH Scenario-Based Assessment – Question 6</div>
+                <div class="slide-subtitle">Please read the scenario carefully and select the most appropriate option.</div>
+                <div class="quiz-container">
+                    <div class="quiz-question"><span>❓</span>A vendor's female employee visits the office regularly. One of the company's employees often jokes about her weight, making comments like, “You should stop eating so much,” or “Looks like the food here is treating you well!” He says he is only joking and it's fine to joke around with colleagues. However, she feels embarrassed and uncomfortable.<div class="quiz-followup">Can she raise a POSH complaint against the company's employee?</div></div>
+                    <div class="quiz-options" id="scenarioAssessmentOptions6">
+                        <div class="quiz-option" data-option="A">A. No. POSH applies only when the aggrieved woman and respondent work for the same organisation.</div>
+                        <div class="quiz-option" data-option="B">B. No. Since he is only joking and there is no sexual intention, it cannot be considered under POSH.</div>
+                        <div class="quiz-option" data-option="C">C. Yes. Any comment about a woman's weight automatically constitutes sexual harassment under POSH.</div>
+                        <div class="quiz-option" data-option="D" data-correct="true">D. Yes. She can raise the concern, and the appropriate authority/ICC should assess whether the conduct falls within the POSH framework based on the circumstances.</div>
+                    </div>
+                    <div class="feedback-message" id="scenarioAssessmentFeedback6" role="status" aria-live="polite"></div>
+                </div>
+            </div>
+
+
+            <!-- Additional POSH Scenario-Based Assessment - Question 7 -->
+            <div class="slide" id="scenarioAssessmentSlide7">
+                <div class="slide-title">📝 POSH Scenario-Based Assessment – Question 7</div>
+                <div class="slide-subtitle">Please read the scenario carefully and select the most appropriate option.</div>
+                <div class="quiz-container">
+                    <div class="quiz-question"><span>❓</span>A manager tells an employee during a private conversation that her promotion "could move faster" if she became more available for dinners outside working hours. He does not explicitly ask for anything sexual.</div>
+                    <div class="quiz-options" id="scenarioAssessmentOptions7">
+                        <div class="quiz-option" data-option="A" data-correct="true">A. The concern arises because a potential employment benefit is being linked to unwelcome personal conduct.</div>
+                        <div class="quiz-option" data-option="B">B. There is no concern because the manager did not explicitly request a sexual favor.</div>
+                        <div class="quiz-option" data-option="C">C. It becomes harassment only if the employee's promotion is denied.</div>
+                        <div class="quiz-option" data-option="D">D. It is only inappropriate workplace behavior unless the manager repeats the suggestion several times.</div>
+                    </div>
+                    <div class="feedback-message" id="scenarioAssessmentFeedback7" role="status" aria-live="polite"></div>
+                </div>
+            </div>
+
+            <!-- Additional POSH Scenario-Based Assessment - Question 8 -->
+            <div class="slide" id="scenarioAssessmentSlide8">
+                <div class="slide-title">📝 POSH Scenario-Based Assessment – Question 8</div>
+                <div class="slide-subtitle">Please read the scenario carefully and select the most appropriate option.</div>
+                <div class="quiz-container">
+                    <div class="quiz-question"><span>❓</span>An employee files a POSH complaint. Afterwards, her manager excludes her from important meetings and gives her an unusually poor appraisal.<div class="quiz-followup">Which statement is correct?</div></div>
+                    <div class="quiz-options" id="scenarioAssessmentOptions8">
+                        <div class="quiz-option" data-option="A">A. The manager can do this because performance appraisals are discretionary.</div>
+                        <div class="quiz-option" data-option="B">B. It is acceptable if the manager does not discuss the complaint.</div>
+                        <div class="quiz-option" data-option="C">C. Retaliation is relevant only after the complaint is proven.</div>
+                        <div class="quiz-option" data-option="D" data-correct="true">D. The conduct raises serious concerns about retaliation and unfair treatment and should be addressed appropriately.</div>
+                    </div>
+                    <div class="feedback-message" id="scenarioAssessmentFeedback8" role="status" aria-live="polite"></div>
+                </div>
+            </div>
+
+            <!-- Additional POSH Scenario-Based Assessment - Question 9 -->
+            <div class="slide" id="scenarioAssessmentSlide9">
+                <div class="slide-title">📝 POSH Scenario-Based Assessment – Question 9</div>
+                <div class="slide-subtitle">Please read the scenario carefully and select the most appropriate option.</div>
+                <div class="quiz-container">
+                    <div class="quiz-question"><span>❓</span>Two colleagues are in a consensual romantic relationship and regularly flirt with each other at work. Both are comfortable with this. One of them later decides to end the relationship. The other continues sending flirtatious messages and making personal comments at work. The person who ended the relationship has asked for the communication to remain professional.<div class="quiz-followup">What is the most appropriate understanding?</div></div>
+                    <div class="quiz-options" id="scenarioAssessmentOptions9">
+                        <div class="quiz-option" data-option="A">A. The conduct cannot be harassment because the relationship was previously consensual.</div>
+                        <div class="quiz-option" data-option="B">B. The conduct remains acceptable because both people previously participated in the flirting.</div>
+                        <div class="quiz-option" data-option="C" data-correct="true">C. Once the relationship and boundaries have changed, continuing unwanted flirtatious or sexual conduct may become unwelcome and should not be justified solely by the previous relationship.</div>
+                        <div class="quiz-option" data-option="D">D. It is only a POSH concern if the person who ended the relationship blocks the other person's number.</div>
+                    </div>
+                    <div class="feedback-message" id="scenarioAssessmentFeedback9" role="status" aria-live="polite"></div>
+                </div>
+            </div>
+
+            <!-- Additional POSH Scenario-Based Assessment - Question 10 -->
+            <div class="slide" id="scenarioAssessmentSlide10">
+                <div class="slide-title">📝 POSH Scenario-Based Assessment – Question 10</div>
+                <div class="slide-subtitle">Please read the scenario carefully and select the most appropriate option.</div>
+                <div class="quiz-container">
+                    <div class="quiz-question"><span>❓</span>During virtual meetings, a colleague repeatedly blows kisses and winks at one employee through the camera. She responds by looking away and eventually switches off her camera, but the colleague continues the behavior in later meetings.</div>
+                    <div class="quiz-options" id="scenarioAssessmentOptions10">
+                        <div class="quiz-option" data-option="A" data-correct="true">A. The behavior is unacceptable and can be construed as harassment, because remote work interactions can fall within the workplace context and the conduct continued despite visible disengagement.</div>
+                        <div class="quiz-option" data-option="B">B. The behavior cannot be harassment because the interaction took place virtually.</div>
+                        <div class="quiz-option" data-option="C">C. It would only be harassment if other members of the meeting complained as well.</div>
+                        <div class="quiz-option" data-option="D">D. The employee should keep her camera on so that the colleague can see her response clearly.</div>
+                    </div>
+                    <div class="feedback-message" id="scenarioAssessmentFeedback10" role="status" aria-live="polite"></div>
+                </div>
+            </div>
+
             <!-- 18. Thank You + Acknowledgement -->
             <div class="slide">
                 <div class="slide-title">✍️ Complete Your Training</div>
@@ -1669,10 +1843,66 @@
         const voiceoverText = `Welcome to Aza Fashions' Employee Awareness Training on the Prevention of Sexual Harassment at Workplace, commonly known as POSH. This training has been designed to help you understand your rights, responsibilities, and our shared commitment to maintaining a safe, respectful, and inclusive workplace. Please pay close attention to each section and participate in the knowledge checks throughout the module.`;
 
         // Initialize
+        // POSH scenario-based assessment interactions
+        const scenarioAssessmentAnswered = {};
+        function setupScenarioAssessment() {
+            const scenarios = [
+                { slideId: 'scenarioAssessmentSlide', optionsId: 'scenarioAssessmentOptions', feedbackId: 'scenarioAssessmentFeedback', correct: 'D',
+                  correctText: 'Correct! Repeated, unwanted physical contact may be inappropriate even if the employee does not verbally object.' },
+                { slideId: 'scenarioAssessmentSlide2', optionsId: 'scenarioAssessmentOptions2', feedbackId: 'scenarioAssessmentFeedback2', correct: 'C',
+                  correctText: 'Correct! A single respectful invitation that is accepted as declined, without pressure or repetition, would generally not constitute POSH.' },
+                { slideId: 'scenarioAssessmentSlide3', optionsId: 'scenarioAssessmentOptions3', feedbackId: 'scenarioAssessmentFeedback3', correct: 'A',
+                  correctText: 'Correct! Legitimate, gender-neutral performance feedback is not sexual harassment merely because an employee feels upset.' },
+                { slideId: 'scenarioAssessmentSlide4', optionsId: 'scenarioAssessmentOptions4', feedbackId: 'scenarioAssessmentFeedback4', correct: 'C',
+                  correctText: 'Correct! Repeated staring after a colleague has asked for it to stop should be assessed in context; intent alone does not settle whether the conduct meets the POSH criteria.' },
+                { slideId: 'scenarioAssessmentSlide5', optionsId: 'scenarioAssessmentOptions5', feedbackId: 'scenarioAssessmentFeedback5', correct: 'B',
+                  correctText: 'Correct! The timing and circumstances may indicate detrimental treatment following rejection of an unwelcome advance, even without an explicit link.' },
+                { slideId: 'scenarioAssessmentSlide6', optionsId: 'scenarioAssessmentOptions6', feedbackId: 'scenarioAssessmentFeedback6', correct: 'D',
+                  correctText: 'Correct! She can raise the concern. The ICC or appropriate authority should assess the circumstances and whether the conduct falls within the POSH framework.' },
+                { slideId: 'scenarioAssessmentSlide7', optionsId: 'scenarioAssessmentOptions7', feedbackId: 'scenarioAssessmentFeedback7', correct: 'A',
+                  correctText: 'Correct! Linking a potential employment benefit to unwelcome personal conduct raises a serious concern even without an explicit request for a sexual favor.' },
+                { slideId: 'scenarioAssessmentSlide8', optionsId: 'scenarioAssessmentOptions8', feedbackId: 'scenarioAssessmentFeedback8', correct: 'D',
+                  correctText: 'Correct! Exclusion from meetings or an unusually poor appraisal after a complaint may raise serious concerns about retaliation and should be addressed appropriately.' },
+                { slideId: 'scenarioAssessmentSlide9', optionsId: 'scenarioAssessmentOptions9', feedbackId: 'scenarioAssessmentFeedback9', correct: 'C',
+                  correctText: 'Correct! Consent and comfort can change. Continuing unwanted flirtatious or sexual conduct after boundaries are made clear should not be justified by a previous consensual relationship.' },
+                { slideId: 'scenarioAssessmentSlide10', optionsId: 'scenarioAssessmentOptions10', feedbackId: 'scenarioAssessmentFeedback10', correct: 'A',
+                  correctText: 'Correct! Workplace interactions can occur virtually, and repeated unwanted gestures may raise harassment concerns even in online meetings.' }
+            ];
+            scenarios.forEach((scenario) => {
+                const options = document.querySelectorAll(`#${scenario.optionsId} .quiz-option`);
+                const feedback = document.getElementById(scenario.feedbackId);
+                scenarioAssessmentAnswered[scenario.slideId] = false;
+                options.forEach(option => {
+                    option.addEventListener('click', function() {
+                        if (scenarioAssessmentAnswered[scenario.slideId]) return;
+                        scenarioAssessmentAnswered[scenario.slideId] = true;
+                        options.forEach(opt => {
+                            opt.classList.remove('selected', 'correct', 'incorrect');
+                            if (opt.dataset.option === scenario.correct) opt.classList.add('correct');
+                        });
+                        if (this.dataset.option === scenario.correct) {
+                            this.classList.add('selected', 'correct');
+                            feedback.className = 'feedback-message show success';
+                            feedback.textContent = scenario.correctText;
+                        } else {
+                            this.classList.add('selected', 'incorrect');
+                            feedback.className = 'feedback-message show error';
+                            feedback.textContent = `That is not the correct option. The correct answer is ${scenario.correct}, highlighted in green.`;
+                        }
+                        options.forEach(opt => { opt.style.pointerEvents = 'none'; opt.style.opacity = '1'; });
+                        nextBtn.disabled = false;
+                        nextBtn.style.opacity = '1';
+                        nextBtn.style.cursor = 'pointer';
+                    });
+                });
+            });
+        }
+
         function init() {
             updateProgress();
             setupExamples();
             setupQuizzes();
+            setupScenarioAssessment();
             bgMusic.volume = 0.05;
             bgMusic.play().catch(() => {});
             // Load completion data if exists
@@ -1714,6 +1944,28 @@
 
             slides.forEach(slide => slide.classList.remove('active'));
             slides[n].classList.add('active');
+            const activeScenario = slides[n].id;
+            if (/^scenarioAssessmentSlide(?:[2-9]|10)?$/.test(activeScenario)) {
+                scenarioAssessmentAnswered[activeScenario] = false;
+                const suffixMatch = activeScenario.match(/^scenarioAssessmentSlide(\d*)$/);
+                const suffix = suffixMatch ? suffixMatch[1] : '';
+                document.querySelectorAll(`#scenarioAssessmentOptions${suffix} .quiz-option`).forEach(opt => {
+                    opt.classList.remove('selected', 'correct', 'incorrect');
+                    opt.style.pointerEvents = 'auto';
+                    opt.style.opacity = '1';
+                });
+                const assessmentFeedback = document.getElementById(`scenarioAssessmentFeedback${suffix}`);
+                assessmentFeedback.className = 'feedback-message';
+                assessmentFeedback.textContent = '';
+                nextBtn.disabled = true;
+                nextBtn.style.opacity = '0.5';
+                nextBtn.style.cursor = 'not-allowed';
+            } else {
+                nextBtn.disabled = false;
+                nextBtn.style.opacity = '1';
+                nextBtn.style.cursor = 'pointer';
+            }
+
             content.scrollTop = 0;
             
             prevBtn.style.display = currentSlide === 0 ? 'none' : 'flex';
@@ -2025,7 +2277,14 @@
                 }
             }
             
-            // Check if on acknowledgement slide (16th slide, 0-indexed 15)
+            const activeScenario = slides[currentSlide].id;
+            if (['scenarioAssessmentSlide', 'scenarioAssessmentSlide2', 'scenarioAssessmentSlide3', 'scenarioAssessmentSlide4', 'scenarioAssessmentSlide5', 'scenarioAssessmentSlide6'].includes(activeScenario) && !scenarioAssessmentAnswered[activeScenario]) {
+                const suffix = activeScenario === 'scenarioAssessmentSlide' ? '' : activeScenario === 'scenarioAssessmentSlide2' ? '2' : activeScenario === 'scenarioAssessmentSlide3' ? '3' : activeScenario === 'scenarioAssessmentSlide4' ? '4' : activeScenario === 'scenarioAssessmentSlide5' ? '5' : '6';
+                document.getElementById(`scenarioAssessmentOptions${suffix}`).scrollIntoView({ behavior: 'smooth', block: 'center' });
+                return;
+            }
+
+            // Check if on acknowledgement slide (third-last slide after assessment questions)
             if (currentSlide === totalSlides - 2) {
                 // Validate acknowledgement form before proceeding
                 const ack1 = document.getElementById('ack1').checked;
