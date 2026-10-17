@@ -536,6 +536,32 @@
                 margin: 20px;
             }
         }
+        /* ===== ANALYSIS PANEL ===== */
+        .analysis-card { background: var(--white); border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); margin-bottom: 30px; overflow: hidden; }
+        .analysis-note { font-size: 13px; color: var(--text-light); }
+        .analysis-body { padding: 24px; }
+        .kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 24px; }
+        .kpi { background: var(--light-bg); border-radius: 10px; padding: 16px; }
+        .kpi-value { font-size: 24px; font-weight: 700; color: var(--primary); }
+        .kpi-label { font-size: 13px; color: var(--text-light); margin-top: 4px; }
+        .analysis-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .analysis-wide { grid-column: 1 / -1; }
+        .analysis-block h3 { font-size: 16px; color: var(--text-dark); margin-bottom: 6px; }
+        .analysis-hint { font-size: 12px; color: var(--text-light); margin-bottom: 12px; }
+        .bar-row { display: grid; grid-template-columns: minmax(180px, 2fr) 3fr minmax(90px, 1fr); gap: 12px; align-items: center; padding: 6px 0; }
+        .bar-label { font-size: 13px; display: flex; flex-direction: column; gap: 2px; }
+        .bar-label span { color: var(--text-light); font-size: 12px; }
+        .bar-track { background: var(--light-bg); border-radius: 6px; height: 14px; overflow: hidden; }
+        .bar-fill { height: 100%; border-radius: 6px; transition: width 0.4s ease; }
+        .bar-value { font-size: 13px; font-weight: 600; }
+        .bar-value small { font-weight: 400; color: var(--text-light); }
+        .missed-item { padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 14px; }
+        .missed-text { font-size: 12px; color: var(--text-light); margin-top: 4px; }
+        @media (max-width: 768px) {
+            .analysis-grid { grid-template-columns: 1fr; }
+            .bar-row { grid-template-columns: 1fr; gap: 4px; }
+            .analysis-body { padding: 16px; }
+        }
     </style>
 </head>
 <body>
@@ -599,14 +625,17 @@
             <div class="stat-card">
                 <h3>Quiz Performance</h3>
                 <div class="value" id="avgQuizScore">0%</div>
-                <div class="description">Average correct answers</div>
+                <div class="description">Average quiz questions answered correctly</div>
             </div>
             <div class="stat-card">
                 <h3>Perfect Completions</h3>
                 <div class="value" id="perfectCompletions">0</div>
-                <div class="description">All quizzes correct</div>
+                <div class="description">All quizzes and scenarios correct</div>
             </div>
         </div>
+
+        <!-- Analysis -->
+        <div id="analysisPanel"></div>
 
         <!-- Employee Responses Table -->
         <div class="table-card">
@@ -787,18 +816,17 @@
         function updateStats() {
             const total = allResponses.length;
             const complete = allResponses.filter(r => r.empName && r.empID && r.empEmail && r.empDept).length;
-            const perfect = allResponses.filter(r => r.quizzesCompleted === 3).length;
-            
-            let avgScore = 0;
-            if (total > 0) {
-                const totalQuizzes = allResponses.reduce((sum, r) => sum + (r.quizzesCompleted || 0), 0);
-                avgScore = Math.round((totalQuizzes / (total * 3)) * 100);
-            }
+            const scored = allResponses.filter(r => getAnswerEntries(r).length > 0).map(r => getProgress(r));
+            const perfect = scored.filter(p => p.quiz === QUIZ_COUNT && p.scenario === SCENARIO_COUNT).length;
+            const avgScore = scored.length
+                ? Math.round(scored.reduce((s, p) => s + p.quiz / QUIZ_COUNT, 0) / scored.length * 100)
+                : 0;
 
             document.getElementById('totalResponses').textContent = total;
             document.getElementById('completeSubmissions').textContent = complete;
             document.getElementById('avgQuizScore').textContent = avgScore + '%';
             document.getElementById('perfectCompletions').textContent = perfect;
+            renderAnalysis();
         }
 
         // Display responses table
@@ -827,9 +855,13 @@
 
             filteredResponses.forEach((response, index) => {
                 const completionDate = new Date(response.completionTimestamp).toLocaleDateString();
-                const quizBadge = response.quizzesCompleted === 3 
-                    ? '<span class="badge badge-success">✓ Perfect (3/3)</span>'
-                    : `<span class="badge badge-warning">${response.quizzesCompleted || 0}/3</span>`;
+                const qp = getProgress(response);
+                const hasAnswers = getAnswerEntries(response).length > 0;
+                const quizBadge = !hasAnswers
+                    ? '<span class="badge badge-warning">Not recorded</span>'
+                    : (qp.quiz === QUIZ_COUNT
+                        ? '<span class="badge badge-success">✓ Perfect (3/3)</span>'
+                        : `<span class="badge badge-warning">${qp.quiz}/${QUIZ_COUNT} correct</span>`);
                 
                 const status = (response.empName && response.empID && response.empEmail && response.empDept)
                     ? '<span class="badge badge-success">Complete</span>'
@@ -1042,51 +1074,75 @@
             }).join('');
         }
 
-        // Export: "Summary" sheet (one row per employee) and "Answers" sheet (one row per employee per question)
+        // ===== EXPORT: one row per employee, every question as columns =====
+        const QUESTION_LIST = [];
+        for (let i = 1; i <= SCENARIO_COUNT; i++) QUESTION_LIST.push({ key: 'scenario_' + i, section: 'Scenario', no: i, label: 'Scenario ' + i });
+        for (let i = 1; i <= QUIZ_COUNT; i++) QUESTION_LIST.push({ key: 'quiz_' + i, section: 'Quiz', no: i, label: 'Quiz ' + i });
+
+        function firstChoiceText(e) {
+            const a = e.attempts && e.attempts[0];
+            return a ? a.choice + '. ' + a.choiceText : '';
+        }
+
+        function resultText(e) {
+            if (!e.attempts || e.attempts.length === 0) return 'Not answered';
+            if (!e.answeredCorrectly) return 'Incorrect';
+            return e.attempts[0].correct ? 'Correct' : 'Correct after retry';
+        }
+
         function buildExportRows() {
-            const summary = [];
-            const answers = [];
-            allResponses.forEach(r => {
+            return allResponses.map(r => {
                 const p = getProgress(r);
-                const base = {
+                const entries = getAnswerEntries(r);
+                const hasAnswers = entries.length > 0;
+                const byKey = {};
+                entries.forEach(e => { byKey[e.key] = e; });
+
+                const row = {
                     'Name': r.empName || '',
                     'Employee ID': r.empID || '',
                     'Email': r.empEmail || '',
                     'Department': r.empDept || '',
                     'Completion Date': r.completionTimestamp ? new Date(r.completionTimestamp).toLocaleDateString('en-GB') : '',
-                    'Completion ID': r.completionID || ''
-                };
-                summary.push(Object.assign({}, base, {
+                    'Completion ID': r.completionID || '',
                     'Ack 1 - POSH Policy Read': r.ack1 ? 'Yes' : 'No',
                     'Ack 2 - Rights & Responsibilities': r.ack2 ? 'Yes' : 'No',
                     'Ack 3 - Report Procedures': r.ack3 ? 'Yes' : 'No',
                     'Ack 4 - Confidentiality': r.ack4 ? 'Yes' : 'No',
                     'Ack 5 - Compliance Confirmed': r.ack5 ? 'Yes' : 'No',
-                    'Acknowledgements (of 5)': p.ack,
-                    'Quizzes Correct (of 3)': p.quiz,
-                    'Scenarios Correct (of 10)': p.scenario,
-                    'Total Completed (of 18)': p.total,
-                    'Verification Code': r.verificationCode || ''
-                }));
-                const entries = getAnswerEntries(r);
-                if (entries.length === 0) {
-                    answers.push(Object.assign({}, base, { 'Section': '-', 'Question No.': '', 'Question': 'Not recorded (submitted before answer tracking)', 'Employee Answer': '', 'Number of Attempts': '', 'Correct Answer': '', 'Result': '', 'All Attempts': '' }));
-                } else {
-                    entries.forEach(e => {
-                        answers.push(Object.assign({}, base, {
-                            'Section': e.type === 'scenario' ? 'Scenario' : 'Quiz',
-                            'Question No.': Number(e.key.split('_')[1]),
-                            'Question': e.question || '',
-                            'Employee Answer': e.attempts && e.attempts.length ? e.attempts[0].choice + '. ' + e.attempts[0].choiceText : '',
-                            'Number of Attempts': (e.attempts || []).length,
-                            'Correct Answer': correctText(e),
-                            'Result': e.answeredCorrectly ? 'Correct' : 'Incorrect',
-                            'All Attempts': describeAttempts(e)
-                        }));
-                    });
-                }
+                    'Acknowledgements (of 5)': p.ack
+                };
+
+                QUESTION_LIST.forEach(q => {
+                    const e = byKey[q.key];
+                    row[q.label + ' - Answer'] = !hasAnswers ? 'Not recorded' : (e ? firstChoiceText(e) : 'Not answered');
+                    row[q.label + ' - Result'] = !hasAnswers ? 'Not recorded' : (e ? resultText(e) : 'Not answered');
+                    row[q.label + ' - All Attempts'] = !hasAnswers ? 'Not recorded' : (e ? describeAttempts(e) : 'Not answered');
+                });
+
+                row['Quizzes Correct (of 3)'] = hasAnswers ? p.quiz : 'Not recorded';
+                row['Scenarios Correct (of 10)'] = hasAnswers ? p.scenario : 'Not recorded';
+                row['Total Completed (of 18)'] = p.total;
+                row['Verification Code'] = r.verificationCode || '';
+                return row;
             });
-            return { summary: summary, answers: answers };
+        }
+
+        // Reference sheet: the full text and options of every question, taken from the first recorded answer to it
+        function buildQuestionKey() {
+            const firstSeen = {};
+            allResponses.forEach(r => getAnswerEntries(r).forEach(e => { if (!firstSeen[e.key]) firstSeen[e.key] = e; }));
+            return QUESTION_LIST.filter(q => firstSeen[q.key]).map(q => {
+                const e = firstSeen[q.key];
+                const opts = Object.keys(e.options || {}).sort().map(k => k + '. ' + e.options[k]).join('  |  ');
+                return {
+                    'Section': q.section,
+                    'Question No.': q.no,
+                    'Question': e.question || '',
+                    'Options': opts,
+                    'Correct Answer': correctText(e)
+                };
+            });
         }
 
         function exportBackendData() {
@@ -1094,19 +1150,20 @@
                 alert('No data to export');
                 return;
             }
-            const data = buildExportRows();
+            const rows = buildExportRows();
+            const keyRows = buildQuestionKey();
             const fileDate = new Date().toISOString().split('T')[0];
 
             if (typeof XLSX === 'undefined') {
-                // Fallback if the Excel library could not load: CSV of the Answers sheet, UTF-8 BOM for Excel
-                const headers = Object.keys(data.answers[0]);
+                // Fallback if the Excel library could not load: CSV with UTF-8 BOM for Excel
+                const headers = Object.keys(rows[0]);
                 const esc = v => '"' + String(v).replace(/"/g, '""') + '"';
-                const csv = '\uFEFF' + [headers.map(esc).join(',')]
-                    .concat(data.answers.map(row => headers.map(h => esc(row[h])).join(',')))
+                const csv = '﻿' + [headers.map(esc).join(',')]
+                    .concat(rows.map(row => headers.map(h => esc(row[h])).join(',')))
                     .join('\n');
                 const a = document.createElement('a');
                 a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8;' }));
-                a.download = 'POSH_Training_Answers_' + fileDate + '.csv';
+                a.download = 'POSH_Training_Responses_' + fileDate + '.csv';
                 document.body.appendChild(a);
                 a.click();
                 document.body.removeChild(a);
@@ -1114,15 +1171,178 @@
             }
 
             const wb = XLSX.utils.book_new();
-            const wsSummary = XLSX.utils.json_to_sheet(data.summary);
-            wsSummary['!cols'] = Object.keys(data.summary[0]).map(k => ({ wch: Math.max(k.length, 14) + 2 }));
-            XLSX.utils.book_append_sheet(wb, wsSummary, 'Summary');
+            const ws = XLSX.utils.json_to_sheet(rows);
+            ws['!cols'] = Object.keys(rows[0]).map(k => {
+                if (/ - Answer$| - All Attempts$/.test(k)) return { wch: 45 };
+                if (/ - Result$/.test(k)) return { wch: 18 };
+                return { wch: Math.max(k.length, 14) + 2 };
+            });
+            XLSX.utils.book_append_sheet(wb, ws, 'Responses');
 
-            const wsAnswers = XLSX.utils.json_to_sheet(data.answers);
-            wsAnswers['!cols'] = Object.keys(data.answers[0]).map(k => ({ wch: k === 'Question' || k === 'All Attempts' || k === 'Correct Answer' ? 60 : Math.max(k.length, 14) + 2 }));
-            XLSX.utils.book_append_sheet(wb, wsAnswers, 'Answers');
+            if (keyRows.length > 0) {
+                const wk = XLSX.utils.json_to_sheet(keyRows);
+                wk['!cols'] = [{ wch: 12 }, { wch: 14 }, { wch: 90 }, { wch: 120 }, { wch: 40 }];
+                XLSX.utils.book_append_sheet(wb, wk, 'Question Key');
+            }
 
             XLSX.writeFile(wb, 'POSH_Training_Responses_' + fileDate + '.xlsx');
+        }
+
+        // ===== ANALYSIS =====
+        function pct(n, d) { return d ? Math.round(n / d * 100) : 0; }
+
+        function computeAnalysis() {
+            const scored = allResponses.filter(r => getAnswerEntries(r).length > 0);
+            const progress = scored.map(r => getProgress(r));
+
+            const questions = QUESTION_LIST.map(q => {
+                let answered = 0, firstTry = 0, eventual = 0;
+                scored.forEach(r => {
+                    const e = getAnswerEntries(r).find(x => x.key === q.key);
+                    if (!e || !e.attempts || e.attempts.length === 0) return;
+                    answered++;
+                    if (e.attempts[0].correct) firstTry++;
+                    if (e.answeredCorrectly) eventual++;
+                });
+                const sample = scored.map(r => getAnswerEntries(r).find(x => x.key === q.key)).find(e => e && e.question);
+                return { q: q, answered: answered, firstTryPct: pct(firstTry, answered), eventualPct: pct(eventual, answered), text: sample ? sample.question : '' };
+            });
+
+            const deptMap = {};
+            allResponses.forEach(r => {
+                const name = r.empDept || 'Not specified';
+                if (!deptMap[name]) deptMap[name] = { dept: name, employees: 0, scored: 0, quiz: 0, scenario: 0, total: 0 };
+                deptMap[name].employees++;
+                if (getAnswerEntries(r).length > 0) {
+                    const p = getProgress(r);
+                    deptMap[name].scored++;
+                    deptMap[name].quiz += p.quiz;
+                    deptMap[name].scenario += p.scenario;
+                    deptMap[name].total += p.total;
+                }
+            });
+            const depts = Object.values(deptMap).sort((a, b) => b.employees - a.employees);
+
+            const bands = [
+                { label: '0 – 6 correct', min: 0, max: 6 },
+                { label: '7 – 12 correct', min: 7, max: 12 },
+                { label: '13 – 15 correct', min: 13, max: 15 },
+                { label: '16 – 18 correct', min: 16, max: 18 }
+            ].map(b => Object.assign(b, { count: progress.filter(p => p.total >= b.min && p.total <= b.max).length }));
+
+            const sum = (arr, f) => arr.reduce((s, x) => s + f(x), 0);
+            const n = progress.length;
+            return {
+                employees: allResponses.length,
+                scored: n,
+                avgTotal: n ? (sum(progress, p => p.total) / n).toFixed(1) : '0',
+                avgPct: pct(sum(progress, p => p.total), n * TOTAL_ITEMS),
+                avgScenario: n ? (sum(progress, p => p.scenario) / n).toFixed(1) : '0',
+                avgQuiz: n ? (sum(progress, p => p.quiz) / n).toFixed(1) : '0',
+                perfect: progress.filter(p => p.quiz === QUIZ_COUNT && p.scenario === SCENARIO_COUNT).length,
+                questions: questions,
+                depts: depts,
+                bands: bands
+            };
+        }
+
+        function barColor(v) {
+            return v < 50 ? 'var(--danger)' : (v < 75 ? 'var(--warning)' : 'var(--success)');
+        }
+
+        function renderAnalysis() {
+            const el = document.getElementById('analysisPanel');
+            if (!el) return;
+            if (allResponses.length === 0) {
+                el.innerHTML = '';
+                return;
+            }
+            const a = computeAnalysis();
+            const q = a.questions;
+            const ranked = q.filter(x => x.answered > 0).slice().sort((x, y) => x.firstTryPct - y.firstTryPct);
+            const hardest = ranked.slice(0, 3);
+            const maxBand = Math.max(1, ...a.bands.map(b => b.count));
+
+            const questionBars = q.map(x => {
+                const label = x.q.label;
+                const short = x.text.length > 110 ? x.text.slice(0, 110) + '…' : x.text;
+                const w = x.answered ? x.firstTryPct : 0;
+                return `
+                    <div class="bar-row" title="${escapeHtml(x.text)}">
+                        <div class="bar-label"><strong>${label}</strong><span>${escapeHtml(short)}</span></div>
+                        <div class="bar-track"><div class="bar-fill" style="width:${w}%; background:${barColor(w)}"></div></div>
+                        <div class="bar-value">${x.answered ? w + '%' : 'no data'}<small> ${x.answered} answered</small></div>
+                    </div>`;
+            }).join('');
+
+            const deptRows = a.depts.map(d => {
+                const avg = d.scored ? (d.total / d.scored).toFixed(1) : '–';
+                const pctv = d.scored ? pct(d.total, d.scored * TOTAL_ITEMS) : 0;
+                return `<tr>
+                    <td><strong>${escapeHtml(d.dept)}</strong></td>
+                    <td>${d.employees}</td>
+                    <td>${d.scored ? avg + ' / ' + TOTAL_ITEMS + ' (' + pctv + '%)' : 'No question data'}</td>
+                    <td>${d.scored ? (d.scenario / d.scored).toFixed(1) + ' / ' + SCENARIO_COUNT : '–'}</td>
+                    <td>${d.scored ? (d.quiz / d.scored).toFixed(1) + ' / ' + QUIZ_COUNT : '–'}</td>
+                </tr>`;
+            }).join('');
+
+            const bandBars = a.bands.map(b => `
+                    <div class="bar-row">
+                        <div class="bar-label"><strong>${b.label}</strong></div>
+                        <div class="bar-track"><div class="bar-fill" style="width:${Math.round(b.count / maxBand * 100)}%; background:var(--primary)"></div></div>
+                        <div class="bar-value">${b.count}<small> employees</small></div>
+                    </div>`).join('');
+
+            const oldCount = a.employees - a.scored;
+
+            el.innerHTML = `
+                <div class="analysis-card">
+                    <div class="table-header">
+                        <h2>Analysis</h2>
+                        <span class="analysis-note">Based on ${a.scored} of ${a.employees} employees with question-level data${oldCount ? ' (' + oldCount + (oldCount === 1 ? ' older submission' : ' older submissions') + ' excluded)' : ''}</span>
+                    </div>
+                    <div class="analysis-body">
+                        <div class="kpi-row">
+                            <div class="kpi"><div class="kpi-value">${a.avgTotal} / ${TOTAL_ITEMS}</div><div class="kpi-label">Average score (${a.avgPct}%)</div></div>
+                            <div class="kpi"><div class="kpi-value">${a.avgScenario} / ${SCENARIO_COUNT}</div><div class="kpi-label">Average scenarios correct</div></div>
+                            <div class="kpi"><div class="kpi-value">${a.avgQuiz} / ${QUIZ_COUNT}</div><div class="kpi-label">Average quizzes correct</div></div>
+                            <div class="kpi"><div class="kpi-value">${a.perfect}</div><div class="kpi-label">Perfect scores (all 13 correct)</div></div>
+                        </div>
+
+                        <div class="analysis-grid">
+                            <div class="analysis-block analysis-wide">
+                                <h3>Correct on first attempt, by question</h3>
+                                <p class="analysis-hint">Red below 50%, amber below 75%, green at 75% or above.</p>
+                                ${questionBars}
+                            </div>
+
+                            <div class="analysis-block">
+                                <h3>Most missed questions</h3>
+                                ${hardest.length ? hardest.map(x => `
+                                    <div class="missed-item">
+                                        <strong>${x.q.label}</strong> – ${x.firstTryPct}% first try
+                                        <div class="missed-text">${escapeHtml(x.text.length > 140 ? x.text.slice(0, 140) + '…' : x.text)}</div>
+                                    </div>`).join('') : '<p class="analysis-hint">No question data yet.</p>'}
+                            </div>
+
+                            <div class="analysis-block">
+                                <h3>Score distribution</h3>
+                                ${bandBars}
+                            </div>
+
+                            <div class="analysis-block analysis-wide">
+                                <h3>By department</h3>
+                                <div class="table-body">
+                                    <table>
+                                        <thead><tr><th>Department</th><th>Employees</th><th>Average total</th><th>Avg scenarios</th><th>Avg quizzes</th></tr></thead>
+                                        <tbody>${deptRows}</tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
         }
 
         // Refresh data
