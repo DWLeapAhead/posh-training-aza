@@ -943,6 +943,69 @@
                 </div>
 
                 <div class="info-section">
+                    <div class="info-section-title">🎓 POSH Scenario Questions (24)</div>
+                    ${(() => {
+                        const scenarioFields = [
+                            'scenario_q1_physical_harassment', 'scenario_q2_physical_harassment',
+                            'scenario_q3_physical_harassment', 'scenario_q4_physical_harassment',
+                            'scenario_q5_verbal_harassment', 'scenario_q6_verbal_harassment',
+                            'scenario_q7_verbal_harassment', 'scenario_q8_verbal_harassment',
+                            'scenario_q9_nonverbal_harassment', 'scenario_q10_nonverbal_harassment',
+                            'scenario_q11_nonverbal_harassment', 'scenario_q12_nonverbal_harassment',
+                            'scenario_q13_digital_harassment', 'scenario_q14_digital_harassment',
+                            'scenario_q15_digital_harassment', 'scenario_q16_digital_harassment',
+                            'scenario_q17_digital_harassment', 'scenario_q18_quid_pro_quo',
+                            'scenario_q19_quid_pro_quo', 'scenario_q20_hostile_env',
+                            'scenario_q21_hostile_env', 'scenario_q22_hostile_env',
+                            'scenario_q23_not_harassment', 'scenario_q24_not_harassment'
+                        ];
+                        const completedScenarios = scenarioFields.filter(field => response[field] === true).length;
+                        return `
+                            <div class="info-row">
+                                <span class="label">Scenarios Completed:</span>
+                                <span class="value">${completedScenarios} / 24</span>
+                            </div>
+                        `;
+                    })()}
+                </div>
+
+                <div class="info-section">
+                    <div class="info-section-title">📈 Overall Progress</div>
+                    ${(() => {
+                        const ackCount = [response.ack1, response.ack2, response.ack3, response.ack4, response.ack5].filter(v => v === true).length;
+                        const quizCount = response.quizzesCompleted || 0;
+                        const scenarioFields = [
+                            'scenario_q1_physical_harassment', 'scenario_q2_physical_harassment',
+                            'scenario_q3_physical_harassment', 'scenario_q4_physical_harassment',
+                            'scenario_q5_verbal_harassment', 'scenario_q6_verbal_harassment',
+                            'scenario_q7_verbal_harassment', 'scenario_q8_verbal_harassment',
+                            'scenario_q9_nonverbal_harassment', 'scenario_q10_nonverbal_harassment',
+                            'scenario_q11_nonverbal_harassment', 'scenario_q12_nonverbal_harassment',
+                            'scenario_q13_digital_harassment', 'scenario_q14_digital_harassment',
+                            'scenario_q15_digital_harassment', 'scenario_q16_digital_harassment',
+                            'scenario_q17_digital_harassment', 'scenario_q18_quid_pro_quo',
+                            'scenario_q19_quid_pro_quo', 'scenario_q20_hostile_env',
+                            'scenario_q21_hostile_env', 'scenario_q22_hostile_env',
+                            'scenario_q23_not_harassment', 'scenario_q24_not_harassment'
+                        ];
+                        const scenarioCount = scenarioFields.filter(field => response[field] === true).length;
+                        const totalItems = 5 + 3 + 24;
+                        const completedItems = ackCount + quizCount + scenarioCount;
+                        const percentage = Math.round((completedItems / totalItems) * 100);
+                        return `
+                            <div class="info-row">
+                                <span class="label">Total Completion:</span>
+                                <span class="value">${completedItems} / ${totalItems} (${percentage}%)</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="label">Breakdown:</span>
+                                <span class="value">Ack: ${ackCount}/5 | Quiz: ${quizCount}/3 | Scenarios: ${scenarioCount}/24</span>
+                            </div>
+                        `;
+                    })()}
+                </div>
+
+                <div class="info-section">
                     <div class="info-section-title">🔐 Verification Codes</div>
                     <div class="info-row" style="flex-direction: column; border: none;">
                         <span class="label" style="margin-bottom: 8px;">Completion ID:</span>
@@ -971,10 +1034,27 @@
                 return;
             }
 
-            let csvContent = 'Name,Employee ID,Email,Department,Completion Date,Quiz Score,Ack1,Ack2,Ack3,Ack4,Ack5,Completion ID\n';
+            let csvContent = 'Name,Employee ID,Email,Department,Completion Date,Quiz Score,Ack1,Ack2,Ack3,Ack4,Ack5,Scenarios Completed,Total Progress,Completion ID\n';
 
             allResponses.forEach(response => {
-                csvContent += `"${response.empName || ''}","${response.empID || ''}","${response.empEmail || ''}","${response.empDept || ''}","${new Date(response.completionTimestamp).toLocaleDateString()}","${response.quizzesCompleted || 0}/3","${response.ack1 ? 'Yes' : 'No'}","${response.ack2 ? 'Yes' : 'No'}","${response.ack3 ? 'Yes' : 'No'}","${response.ack4 ? 'Yes' : 'No'}","${response.ack5 ? 'Yes' : 'No'}","${response.completionID}"\n`;
+                const scenarioFields = [
+                    'scenario_q1_physical_harassment', 'scenario_q2_physical_harassment',
+                    'scenario_q3_physical_harassment', 'scenario_q4_physical_harassment',
+                    'scenario_q5_verbal_harassment', 'scenario_q6_verbal_harassment',
+                    'scenario_q7_verbal_harassment', 'scenario_q8_verbal_harassment',
+                    'scenario_q9_nonverbal_harassment', 'scenario_q10_nonverbal_harassment',
+                    'scenario_q11_nonverbal_harassment', 'scenario_q12_nonverbal_harassment',
+                    'scenario_q13_digital_harassment', 'scenario_q14_digital_harassment',
+                    'scenario_q15_digital_harassment', 'scenario_q16_digital_harassment',
+                    'scenario_q17_digital_harassment', 'scenario_q18_quid_pro_quo',
+                    'scenario_q19_quid_pro_quo', 'scenario_q20_hostile_env',
+                    'scenario_q21_hostile_env', 'scenario_q22_hostile_env',
+                    'scenario_q23_not_harassment', 'scenario_q24_not_harassment'
+                ];
+                const scenarioCount = scenarioFields.filter(field => response[field] === true).length;
+                const ackCount = [response.ack1, response.ack2, response.ack3, response.ack4, response.ack5].filter(v => v === true).length;
+                const totalCompleted = ackCount + (response.quizzesCompleted || 0) + scenarioCount;
+                csvContent += `"${response.empName || ''}","${response.empID || ''}","${response.empEmail || ''}","${response.empDept || ''}","${new Date(response.completionTimestamp).toLocaleDateString()}","${response.quizzesCompleted || 0}/3","${response.ack1 ? 'Yes' : 'No'}","${response.ack2 ? 'Yes' : 'No'}","${response.ack3 ? 'Yes' : 'No'}","${response.ack4 ? 'Yes' : 'No'}","${response.ack5 ? 'Yes' : 'No'}","${scenarioCount}/24","${totalCompleted}/32","${response.completionID}"\n`;
             });
 
             const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });

@@ -2368,7 +2368,32 @@
                 verificationCode: verificationCode,
                 completionDate: new Date().toLocaleDateString(),
                 completionTimestamp: new Date().toISOString(),
-                quizzesCompleted: completedQuizzes.length
+                quizzesCompleted: completedQuizzes.length,
+                // Add all 24 scenario question responses
+                scenario_q1_physical_harassment: scenarioAssessmentAnswered['scenarioAssessmentSlide'] || false,
+                scenario_q2_physical_harassment: scenarioAssessmentAnswered['scenarioAssessmentSlide2'] || false,
+                scenario_q3_physical_harassment: scenarioAssessmentAnswered['scenarioAssessmentSlide3'] || false,
+                scenario_q4_physical_harassment: scenarioAssessmentAnswered['scenarioAssessmentSlide4'] || false,
+                scenario_q5_verbal_harassment: scenarioAssessmentAnswered['scenarioAssessmentSlide5'] || false,
+                scenario_q6_verbal_harassment: scenarioAssessmentAnswered['scenarioAssessmentSlide6'] || false,
+                scenario_q7_verbal_harassment: scenarioAssessmentAnswered['scenarioAssessmentSlide7'] || false,
+                scenario_q8_verbal_harassment: scenarioAssessmentAnswered['scenarioAssessmentSlide8'] || false,
+                scenario_q9_nonverbal_harassment: scenarioAssessmentAnswered['scenarioAssessmentSlide9'] || false,
+                scenario_q10_nonverbal_harassment: scenarioAssessmentAnswered['scenarioAssessmentSlide10'] || false,
+                scenario_q11_nonverbal_harassment: false, // Placeholder for future scenarios
+                scenario_q12_nonverbal_harassment: false,
+                scenario_q13_digital_harassment: false,
+                scenario_q14_digital_harassment: false,
+                scenario_q15_digital_harassment: false,
+                scenario_q16_digital_harassment: false,
+                scenario_q17_digital_harassment: false,
+                scenario_q18_quid_pro_quo: false,
+                scenario_q19_quid_pro_quo: false,
+                scenario_q20_hostile_env: false,
+                scenario_q21_hostile_env: false,
+                scenario_q22_hostile_env: false,
+                scenario_q23_not_harassment: false,
+                scenario_q24_not_harassment: false
             };
 
             // Save to localStorage
