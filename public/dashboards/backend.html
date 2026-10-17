@@ -945,66 +945,24 @@
                 </div>
 
                 <div class="info-section">
-                    <div class="info-section-title">🎓 POSH Scenario Questions (24)</div>
+                    <div class="info-section-title">📈 Overall Progress</div>
                     ${(() => {
-                        const scenarioFields = [
-                            'scenario_q1_physical_harassment', 'scenario_q2_physical_harassment',
-                            'scenario_q3_physical_harassment', 'scenario_q4_physical_harassment',
-                            'scenario_q5_verbal_harassment', 'scenario_q6_verbal_harassment',
-                            'scenario_q7_verbal_harassment', 'scenario_q8_verbal_harassment',
-                            'scenario_q9_nonverbal_harassment', 'scenario_q10_nonverbal_harassment',
-                            'scenario_q11_nonverbal_harassment', 'scenario_q12_nonverbal_harassment',
-                            'scenario_q13_digital_harassment', 'scenario_q14_digital_harassment',
-                            'scenario_q15_digital_harassment', 'scenario_q16_digital_harassment',
-                            'scenario_q17_digital_harassment', 'scenario_q18_quid_pro_quo',
-                            'scenario_q19_quid_pro_quo', 'scenario_q20_hostile_env',
-                            'scenario_q21_hostile_env', 'scenario_q22_hostile_env',
-                            'scenario_q23_not_harassment', 'scenario_q24_not_harassment'
-                        ];
-                        const completedScenarios = scenarioFields.filter(field => response[field] === true).length;
+                        const p = getProgress(response);
                         return `
                             <div class="info-row">
-                                <span class="label">Scenarios Completed:</span>
-                                <span class="value">${completedScenarios} / 24</span>
+                                <span class="label">Total Completion:</span>
+                                <span class="value">${p.total} / ${TOTAL_ITEMS} (${p.percent}%)</span>
                             </div>
-                        `;
+                            <div class="info-row">
+                                <span class="label">Breakdown:</span>
+                                <span class="value">Ack: ${p.ack}/5 | Quiz correct: ${p.quiz}/${QUIZ_COUNT} | Scenarios correct: ${p.scenario}/${SCENARIO_COUNT}</span>
+                            </div>`;
                     })()}
                 </div>
 
                 <div class="info-section">
-                    <div class="info-section-title">📈 Overall Progress</div>
-                    ${(() => {
-                        const ackCount = [response.ack1, response.ack2, response.ack3, response.ack4, response.ack5].filter(v => v === true).length;
-                        const quizCount = response.quizzesCompleted || 0;
-                        const scenarioFields = [
-                            'scenario_q1_physical_harassment', 'scenario_q2_physical_harassment',
-                            'scenario_q3_physical_harassment', 'scenario_q4_physical_harassment',
-                            'scenario_q5_verbal_harassment', 'scenario_q6_verbal_harassment',
-                            'scenario_q7_verbal_harassment', 'scenario_q8_verbal_harassment',
-                            'scenario_q9_nonverbal_harassment', 'scenario_q10_nonverbal_harassment',
-                            'scenario_q11_nonverbal_harassment', 'scenario_q12_nonverbal_harassment',
-                            'scenario_q13_digital_harassment', 'scenario_q14_digital_harassment',
-                            'scenario_q15_digital_harassment', 'scenario_q16_digital_harassment',
-                            'scenario_q17_digital_harassment', 'scenario_q18_quid_pro_quo',
-                            'scenario_q19_quid_pro_quo', 'scenario_q20_hostile_env',
-                            'scenario_q21_hostile_env', 'scenario_q22_hostile_env',
-                            'scenario_q23_not_harassment', 'scenario_q24_not_harassment'
-                        ];
-                        const scenarioCount = scenarioFields.filter(field => response[field] === true).length;
-                        const totalItems = 5 + 3 + 24;
-                        const completedItems = ackCount + quizCount + scenarioCount;
-                        const percentage = Math.round((completedItems / totalItems) * 100);
-                        return `
-                            <div class="info-row">
-                                <span class="label">Total Completion:</span>
-                                <span class="value">${completedItems} / ${totalItems} (${percentage}%)</span>
-                            </div>
-                            <div class="info-row">
-                                <span class="label">Breakdown:</span>
-                                <span class="value">Ack: ${ackCount}/5 | Quiz: ${quizCount}/3 | Scenarios: ${scenarioCount}/24</span>
-                            </div>
-                        `;
-                    })()}
+                    <div class="info-section-title">📝 Answers, question by question</div>
+                    ${renderAnswersHTML(response)}
                 </div>
 
                 <div class="info-section">
@@ -1030,76 +988,141 @@
         }
 
         // Export all data as CSV
-        const SCENARIO_FIELDS = [
-            'scenario_q1_physical_harassment', 'scenario_q2_physical_harassment',
-            'scenario_q3_physical_harassment', 'scenario_q4_physical_harassment',
-            'scenario_q5_verbal_harassment', 'scenario_q6_verbal_harassment',
-            'scenario_q7_verbal_harassment', 'scenario_q8_verbal_harassment',
-            'scenario_q9_nonverbal_harassment', 'scenario_q10_nonverbal_harassment',
-            'scenario_q11_nonverbal_harassment', 'scenario_q12_nonverbal_harassment',
-            'scenario_q13_digital_harassment', 'scenario_q14_digital_harassment',
-            'scenario_q15_digital_harassment', 'scenario_q16_digital_harassment',
-            'scenario_q17_digital_harassment', 'scenario_q18_quid_pro_quo',
-            'scenario_q19_quid_pro_quo', 'scenario_q20_hostile_env',
-            'scenario_q21_hostile_env', 'scenario_q22_hostile_env',
-            'scenario_q23_not_harassment', 'scenario_q24_not_harassment'
-        ];
+        const SCENARIO_COUNT = 10;
+        const QUIZ_COUNT = 3;
+        const TOTAL_ITEMS = 5 + QUIZ_COUNT + SCENARIO_COUNT;
 
-        // Export all responses to an Excel (.xlsx) file, one row per employee
-        function exportBackendData() {
-            if (allResponses.length === 0) {
-                alert('No data to export');
-                return;
+        // All recorded question answers for one employee, in order: scenarios 1-10, then quizzes 1-3
+        function getAnswerEntries(r) {
+            const entries = Object.entries(r.responses || {}).map(([key, v]) => Object.assign({ key: key }, v));
+            const rank = e => {
+                const m = e.key.match(/^(scenario|quiz)_(\d+)$/);
+                return m ? (m[1] === 'scenario' ? 0 : 100) + Number(m[2]) : 999;
+            };
+            return entries.sort((a, b) => rank(a) - rank(b));
+        }
+
+        function getProgress(r) {
+            const entries = getAnswerEntries(r);
+            const ack = [r.ack1, r.ack2, r.ack3, r.ack4, r.ack5].filter(v => v === true).length;
+            const quiz = entries.length
+                ? entries.filter(e => e.type === 'quiz' && e.answeredCorrectly).length
+                : (Number(r.quizzesCompleted) || 0);
+            const scenario = entries.length
+                ? entries.filter(e => e.type === 'scenario' && e.answeredCorrectly).length
+                : (Number(r.scenariosCompleted) || 0);
+            const total = ack + quiz + scenario;
+            return { ack: ack, quiz: quiz, scenario: scenario, total: total, percent: Math.round(total / TOTAL_ITEMS * 100) };
+        }
+
+        function describeAttempts(e) {
+            if (!e.attempts || e.attempts.length === 0) return 'No answer';
+            return e.attempts.map(a => a.choice + '. ' + a.choiceText + (a.correct ? ' (correct)' : ' (incorrect)')).join(' → ');
+        }
+
+        function correctText(e) {
+            return e.correctAnswer ? e.correctAnswer + '. ' + ((e.options || {})[e.correctAnswer] || '') : '';
+        }
+
+        function renderAnswersHTML(r) {
+            const entries = getAnswerEntries(r);
+            if (entries.length === 0) {
+                return '<div class="info-row"><span class="value" style="text-align:left">Question-level answers were not recorded for this submission (it was made before answer tracking was added).</span></div>';
             }
+            return entries.map((e, i) => {
+                const label = e.type === 'scenario' ? 'Scenario ' + e.key.split('_')[1] : 'Quiz ' + e.key.split('_')[1];
+                const result = e.answeredCorrectly ? '<span class="badge badge-success">Correct</span>' : '<span class="badge badge-warning">Incorrect</span>';
+                return `
+                    <div class="info-row" style="flex-direction: column; align-items: flex-start;">
+                        <span class="label">${label} ${result}</span>
+                        <span class="value" style="text-align:left; margin-top:6px;">${escapeHtml(e.question || '')}</span>
+                        <span class="value" style="text-align:left; margin-top:6px;"><strong>Answered:</strong> ${escapeHtml(describeAttempts(e))}</span>
+                        <span class="value" style="text-align:left;"><strong>Correct answer:</strong> ${escapeHtml(correctText(e))}</span>
+                    </div>`;
+            }).join('');
+        }
 
-            const rows = allResponses.map(r => {
-                const ackCount = [r.ack1, r.ack2, r.ack3, r.ack4, r.ack5].filter(v => v === true).length;
-                const scenarioCount = SCENARIO_FIELDS.filter(f => r[f] === true).length;
-                const quizCount = Number(r.quizzesCompleted) || 0;
-                return {
+        // Export: "Summary" sheet (one row per employee) and "Answers" sheet (one row per employee per question)
+        function buildExportRows() {
+            const summary = [];
+            const answers = [];
+            allResponses.forEach(r => {
+                const p = getProgress(r);
+                const base = {
                     'Name': r.empName || '',
                     'Employee ID': r.empID || '',
                     'Email': r.empEmail || '',
                     'Department': r.empDept || '',
                     'Completion Date': r.completionTimestamp ? new Date(r.completionTimestamp).toLocaleDateString('en-GB') : '',
+                    'Completion ID': r.completionID || ''
+                };
+                summary.push(Object.assign({}, base, {
                     'Ack 1 - POSH Policy Read': r.ack1 ? 'Yes' : 'No',
                     'Ack 2 - Rights & Responsibilities': r.ack2 ? 'Yes' : 'No',
                     'Ack 3 - Report Procedures': r.ack3 ? 'Yes' : 'No',
                     'Ack 4 - Confidentiality': r.ack4 ? 'Yes' : 'No',
                     'Ack 5 - Compliance Confirmed': r.ack5 ? 'Yes' : 'No',
-                    'Acknowledgements (of 5)': ackCount,
-                    'Quizzes Correct (of 3)': quizCount,
-                    'Scenarios Completed (of 24)': scenarioCount,
-                    'Total Completed (of 32)': ackCount + quizCount + scenarioCount,
-                    'Completion ID': r.completionID || '',
+                    'Acknowledgements (of 5)': p.ack,
+                    'Quizzes Correct (of 3)': p.quiz,
+                    'Scenarios Correct (of 10)': p.scenario,
+                    'Total Completed (of 18)': p.total,
                     'Verification Code': r.verificationCode || ''
-                };
+                }));
+                const entries = getAnswerEntries(r);
+                if (entries.length === 0) {
+                    answers.push(Object.assign({}, base, { 'Section': '-', 'Question No.': '', 'Question': 'Not recorded (submitted before answer tracking)', 'Employee Answer': '', 'Number of Attempts': '', 'Correct Answer': '', 'Result': '', 'All Attempts': '' }));
+                } else {
+                    entries.forEach(e => {
+                        answers.push(Object.assign({}, base, {
+                            'Section': e.type === 'scenario' ? 'Scenario' : 'Quiz',
+                            'Question No.': Number(e.key.split('_')[1]),
+                            'Question': e.question || '',
+                            'Employee Answer': e.attempts && e.attempts.length ? e.attempts[0].choice + '. ' + e.attempts[0].choiceText : '',
+                            'Number of Attempts': (e.attempts || []).length,
+                            'Correct Answer': correctText(e),
+                            'Result': e.answeredCorrectly ? 'Correct' : 'Incorrect',
+                            'All Attempts': describeAttempts(e)
+                        }));
+                    });
+                }
             });
+            return { summary: summary, answers: answers };
+        }
 
+        function exportBackendData() {
+            if (allResponses.length === 0) {
+                alert('No data to export');
+                return;
+            }
+            const data = buildExportRows();
             const fileDate = new Date().toISOString().split('T')[0];
 
             if (typeof XLSX === 'undefined') {
-                // Fallback if the Excel library could not load: CSV with UTF-8 BOM so Excel reads it correctly
-                const headers = Object.keys(rows[0]);
-                const esc = v => `"${String(v).replace(/"/g, '""')}"`;
+                // Fallback if the Excel library could not load: CSV of the Answers sheet, UTF-8 BOM for Excel
+                const headers = Object.keys(data.answers[0]);
+                const esc = v => '"' + String(v).replace(/"/g, '""') + '"';
                 const csv = '\uFEFF' + [headers.map(esc).join(',')]
-                    .concat(rows.map(row => headers.map(h => esc(row[h])).join(',')))
+                    .concat(data.answers.map(row => headers.map(h => esc(row[h])).join(',')))
                     .join('\n');
-                const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8;' }));
                 const a = document.createElement('a');
-                a.href = url;
-                a.download = `POSH_Training_Responses_${fileDate}.csv`;
+                a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8;' }));
+                a.download = 'POSH_Training_Answers_' + fileDate + '.csv';
                 document.body.appendChild(a);
                 a.click();
                 document.body.removeChild(a);
                 return;
             }
 
-            const ws = XLSX.utils.json_to_sheet(rows);
-            ws['!cols'] = Object.keys(rows[0]).map(k => ({ wch: Math.max(k.length, 14) + 2 }));
             const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, 'Responses');
-            XLSX.writeFile(wb, `POSH_Training_Responses_${fileDate}.xlsx`);
+            const wsSummary = XLSX.utils.json_to_sheet(data.summary);
+            wsSummary['!cols'] = Object.keys(data.summary[0]).map(k => ({ wch: Math.max(k.length, 14) + 2 }));
+            XLSX.utils.book_append_sheet(wb, wsSummary, 'Summary');
+
+            const wsAnswers = XLSX.utils.json_to_sheet(data.answers);
+            wsAnswers['!cols'] = Object.keys(data.answers[0]).map(k => ({ wch: k === 'Question' || k === 'All Attempts' || k === 'Correct Answer' ? 60 : Math.max(k.length, 14) + 2 }));
+            XLSX.utils.book_append_sheet(wb, wsAnswers, 'Answers');
+
+            XLSX.writeFile(wb, 'POSH_Training_Responses_' + fileDate + '.xlsx');
         }
 
         // Refresh data

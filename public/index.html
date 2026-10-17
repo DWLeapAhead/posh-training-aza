@@ -1861,6 +1861,48 @@
         let isVoiceoverPlaying = false;
         let completedQuizzes = [];
 
+        // Full record of every question's answers (saved with the completion)
+        const responseLog = {};
+        function getQuestionInfo(container) {
+            let text = '';
+            const qEl = container.querySelector('.quiz-question');
+            if (qEl) {
+                const clone = qEl.cloneNode(true);
+                clone.querySelectorAll('span').forEach(sp => sp.remove());
+                text = clone.textContent.replace(/\s+/g, ' ').trim();
+            }
+            const options = {};
+            let correctAnswer = '';
+            container.querySelectorAll('.quiz-option').forEach((opt, i) => {
+                const letter = opt.dataset.option || String.fromCharCode(65 + i);
+                options[letter] = opt.textContent.trim().replace(/^[A-D][.)]\s*/, '').trim();
+                if (opt.dataset.correct === 'true') correctAnswer = letter;
+            });
+            return { text, options, correctAnswer };
+        }
+        function logAttempt(key, type, container, letter, correctOverride) {
+            if (!responseLog[key]) {
+                const info = getQuestionInfo(container);
+                responseLog[key] = {
+                    type: type,
+                    question: info.text,
+                    options: info.options,
+                    correctAnswer: correctOverride || info.correctAnswer,
+                    attempts: [],
+                    answeredCorrectly: false
+                };
+            }
+            const entry = responseLog[key];
+            const isCorrect = letter === entry.correctAnswer;
+            entry.attempts.push({
+                choice: letter,
+                choiceText: entry.options[letter] || '',
+                correct: isCorrect,
+                time: new Date().toISOString()
+            });
+            if (isCorrect) entry.answeredCorrectly = true;
+        }
+
         // Voiceover text
         const voiceoverText = `Welcome to Aza Fashions' Employee Awareness Training on the Prevention of Sexual Harassment at Workplace, commonly known as POSH. This training has been designed to help you understand your rights, responsibilities, and our shared commitment to maintaining a safe, respectful, and inclusive workplace. Please pay close attention to each section and participate in the knowledge checks throughout the module.`;
 
@@ -1890,7 +1932,7 @@
                 { slideId: 'scenarioAssessmentSlide10', optionsId: 'scenarioAssessmentOptions10', feedbackId: 'scenarioAssessmentFeedback10', correct: 'A',
                   correctText: 'Correct! Workplace interactions can occur virtually, and repeated unwanted gestures may raise harassment concerns even in online meetings.' }
             ];
-            scenarios.forEach((scenario) => {
+            scenarios.forEach((scenario, idx) => {
                 const options = document.querySelectorAll(`#${scenario.optionsId} .quiz-option`);
                 const feedback = document.getElementById(scenario.feedbackId);
                 scenarioAssessmentAnswered[scenario.slideId] = false;
@@ -1898,6 +1940,7 @@
                     option.addEventListener('click', function() {
                         if (scenarioAssessmentAnswered[scenario.slideId]) return;
                         scenarioAssessmentAnswered[scenario.slideId] = true;
+                        logAttempt('scenario_' + (idx + 1), 'scenario', document.getElementById(scenario.slideId), this.dataset.option, scenario.correct);
                         options.forEach(opt => {
                             opt.classList.remove('selected', 'correct', 'incorrect');
                             if (opt.dataset.option === scenario.correct) opt.classList.add('correct');
@@ -2173,6 +2216,8 @@
                 quiz.querySelectorAll('.quiz-option').forEach(option => {
                     option.addEventListener('click', function() {
                         if (this.classList.contains('selected')) return;
+                        const letter = this.dataset.option || String.fromCharCode(65 + Array.from(quiz.querySelectorAll('.quiz-option')).indexOf(this));
+                        logAttempt('quiz_' + (index + 1), 'quiz', quiz.parentElement, letter);
 
                         // Mark that an option has been selected for this quiz
                         optionSelected[quizId] = true;
@@ -2391,31 +2436,8 @@
                 completionDate: new Date().toLocaleDateString(),
                 completionTimestamp: new Date().toISOString(),
                 quizzesCompleted: completedQuizzes.length,
-                // Add all 24 scenario question responses
-                scenario_q1_physical_harassment: scenarioAssessmentAnswered['scenarioAssessmentSlide'] || false,
-                scenario_q2_physical_harassment: scenarioAssessmentAnswered['scenarioAssessmentSlide2'] || false,
-                scenario_q3_physical_harassment: scenarioAssessmentAnswered['scenarioAssessmentSlide3'] || false,
-                scenario_q4_physical_harassment: scenarioAssessmentAnswered['scenarioAssessmentSlide4'] || false,
-                scenario_q5_verbal_harassment: scenarioAssessmentAnswered['scenarioAssessmentSlide5'] || false,
-                scenario_q6_verbal_harassment: scenarioAssessmentAnswered['scenarioAssessmentSlide6'] || false,
-                scenario_q7_verbal_harassment: scenarioAssessmentAnswered['scenarioAssessmentSlide7'] || false,
-                scenario_q8_verbal_harassment: scenarioAssessmentAnswered['scenarioAssessmentSlide8'] || false,
-                scenario_q9_nonverbal_harassment: scenarioAssessmentAnswered['scenarioAssessmentSlide9'] || false,
-                scenario_q10_nonverbal_harassment: scenarioAssessmentAnswered['scenarioAssessmentSlide10'] || false,
-                scenario_q11_nonverbal_harassment: false, // Placeholder for future scenarios
-                scenario_q12_nonverbal_harassment: false,
-                scenario_q13_digital_harassment: false,
-                scenario_q14_digital_harassment: false,
-                scenario_q15_digital_harassment: false,
-                scenario_q16_digital_harassment: false,
-                scenario_q17_digital_harassment: false,
-                scenario_q18_quid_pro_quo: false,
-                scenario_q19_quid_pro_quo: false,
-                scenario_q20_hostile_env: false,
-                scenario_q21_hostile_env: false,
-                scenario_q22_hostile_env: false,
-                scenario_q23_not_harassment: false,
-                scenario_q24_not_harassment: false
+                scenariosCompleted: Object.values(responseLog).filter(r => r.type === 'scenario' && r.answeredCorrectly).length,
+                responses: responseLog
             };
 
             // Save to localStorage
