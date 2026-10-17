@@ -9,6 +9,8 @@
     <!-- Firebase SDK (Compat Version for Global API) -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+    <!-- SheetJS: Excel export -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     
     <style>
         * {
@@ -1028,44 +1030,76 @@
         }
 
         // Export all data as CSV
+        const SCENARIO_FIELDS = [
+            'scenario_q1_physical_harassment', 'scenario_q2_physical_harassment',
+            'scenario_q3_physical_harassment', 'scenario_q4_physical_harassment',
+            'scenario_q5_verbal_harassment', 'scenario_q6_verbal_harassment',
+            'scenario_q7_verbal_harassment', 'scenario_q8_verbal_harassment',
+            'scenario_q9_nonverbal_harassment', 'scenario_q10_nonverbal_harassment',
+            'scenario_q11_nonverbal_harassment', 'scenario_q12_nonverbal_harassment',
+            'scenario_q13_digital_harassment', 'scenario_q14_digital_harassment',
+            'scenario_q15_digital_harassment', 'scenario_q16_digital_harassment',
+            'scenario_q17_digital_harassment', 'scenario_q18_quid_pro_quo',
+            'scenario_q19_quid_pro_quo', 'scenario_q20_hostile_env',
+            'scenario_q21_hostile_env', 'scenario_q22_hostile_env',
+            'scenario_q23_not_harassment', 'scenario_q24_not_harassment'
+        ];
+
+        // Export all responses to an Excel (.xlsx) file, one row per employee
         function exportBackendData() {
             if (allResponses.length === 0) {
                 alert('No data to export');
                 return;
             }
 
-            let csvContent = 'Name,Employee ID,Email,Department,Completion Date,Quiz Score,Ack1,Ack2,Ack3,Ack4,Ack5,Scenarios Completed,Total Progress,Completion ID\n';
-
-            allResponses.forEach(response => {
-                const scenarioFields = [
-                    'scenario_q1_physical_harassment', 'scenario_q2_physical_harassment',
-                    'scenario_q3_physical_harassment', 'scenario_q4_physical_harassment',
-                    'scenario_q5_verbal_harassment', 'scenario_q6_verbal_harassment',
-                    'scenario_q7_verbal_harassment', 'scenario_q8_verbal_harassment',
-                    'scenario_q9_nonverbal_harassment', 'scenario_q10_nonverbal_harassment',
-                    'scenario_q11_nonverbal_harassment', 'scenario_q12_nonverbal_harassment',
-                    'scenario_q13_digital_harassment', 'scenario_q14_digital_harassment',
-                    'scenario_q15_digital_harassment', 'scenario_q16_digital_harassment',
-                    'scenario_q17_digital_harassment', 'scenario_q18_quid_pro_quo',
-                    'scenario_q19_quid_pro_quo', 'scenario_q20_hostile_env',
-                    'scenario_q21_hostile_env', 'scenario_q22_hostile_env',
-                    'scenario_q23_not_harassment', 'scenario_q24_not_harassment'
-                ];
-                const scenarioCount = scenarioFields.filter(field => response[field] === true).length;
-                const ackCount = [response.ack1, response.ack2, response.ack3, response.ack4, response.ack5].filter(v => v === true).length;
-                const totalCompleted = ackCount + (response.quizzesCompleted || 0) + scenarioCount;
-                csvContent += `"${response.empName || ''}","${response.empID || ''}","${response.empEmail || ''}","${response.empDept || ''}","${new Date(response.completionTimestamp).toLocaleDateString()}","${response.quizzesCompleted || 0}/3","${response.ack1 ? 'Yes' : 'No'}","${response.ack2 ? 'Yes' : 'No'}","${response.ack3 ? 'Yes' : 'No'}","${response.ack4 ? 'Yes' : 'No'}","${response.ack5 ? 'Yes' : 'No'}","${scenarioCount}/24","${totalCompleted}/32","${response.completionID}"\n`;
+            const rows = allResponses.map(r => {
+                const ackCount = [r.ack1, r.ack2, r.ack3, r.ack4, r.ack5].filter(v => v === true).length;
+                const scenarioCount = SCENARIO_FIELDS.filter(f => r[f] === true).length;
+                const quizCount = Number(r.quizzesCompleted) || 0;
+                return {
+                    'Name': r.empName || '',
+                    'Employee ID': r.empID || '',
+                    'Email': r.empEmail || '',
+                    'Department': r.empDept || '',
+                    'Completion Date': r.completionTimestamp ? new Date(r.completionTimestamp).toLocaleDateString('en-GB') : '',
+                    'Ack 1 - POSH Policy Read': r.ack1 ? 'Yes' : 'No',
+                    'Ack 2 - Rights & Responsibilities': r.ack2 ? 'Yes' : 'No',
+                    'Ack 3 - Report Procedures': r.ack3 ? 'Yes' : 'No',
+                    'Ack 4 - Confidentiality': r.ack4 ? 'Yes' : 'No',
+                    'Ack 5 - Compliance Confirmed': r.ack5 ? 'Yes' : 'No',
+                    'Acknowledgements (of 5)': ackCount,
+                    'Quizzes Correct (of 3)': quizCount,
+                    'Scenarios Completed (of 24)': scenarioCount,
+                    'Total Completed (of 32)': ackCount + quizCount + scenarioCount,
+                    'Completion ID': r.completionID || '',
+                    'Verification Code': r.verificationCode || ''
+                };
             });
 
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement('a');
-            const url = URL.createObjectURL(blob);
-            link.setAttribute('href', url);
-            link.setAttribute('download', `POSH_Training_Responses_${new Date().toISOString().split('T')[0]}.csv`);
-            link.style.visibility = 'hidden';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+            const fileDate = new Date().toISOString().split('T')[0];
+
+            if (typeof XLSX === 'undefined') {
+                // Fallback if the Excel library could not load: CSV with UTF-8 BOM so Excel reads it correctly
+                const headers = Object.keys(rows[0]);
+                const esc = v => `"${String(v).replace(/"/g, '""')}"`;
+                const csv = '\uFEFF' + [headers.map(esc).join(',')]
+                    .concat(rows.map(row => headers.map(h => esc(row[h])).join(',')))
+                    .join('\n');
+                const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8;' }));
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `POSH_Training_Responses_${fileDate}.csv`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                return;
+            }
+
+            const ws = XLSX.utils.json_to_sheet(rows);
+            ws['!cols'] = Object.keys(rows[0]).map(k => ({ wch: Math.max(k.length, 14) + 2 }));
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'Responses');
+            XLSX.writeFile(wb, `POSH_Training_Responses_${fileDate}.xlsx`);
         }
 
         // Refresh data
