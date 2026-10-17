@@ -18,7 +18,7 @@ https://posh-training-virid.vercel.app/
 ### For Admins:
 ```
 Admin Dashboard: https://posh-training-virid.vercel.app/dashboards/admin.html
-Password: Aza@Admin2026
+
 
 Backend Dashboard: https://posh-training-virid.vercel.app/dashboards/backend.html
 Email: admin@azafashions.com
