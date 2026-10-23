@@ -872,7 +872,7 @@
                 <div class="progress-bar">
                     <div class="progress-fill" id="progressFill"></div>
                 </div>
-                <div class="progress-text" id="progressText">Slide 1 of 18</div>
+                <div class="progress-text" id="progressText">Slide 1 of 30</div>
             </div>
         </div>
 
@@ -948,6 +948,22 @@
                             Click <strong>"🎓 START TRAINING NOW"</strong> above to begin the training
                         </p>
                     </div>
+                </div>
+            </div>
+
+            <!-- Instructions (new slide 2) -->
+            <div class="slide">
+                <div class="slide-title" style="font-size: 28px; margin-bottom: 20px;">📋 Instructions for POSH Online Training</div>
+                <div class="content-text" style="margin-top: 20px;">
+                    <ul style="font-size: 16px; line-height: 1.7; color: #333; padding-left: 22px;">
+                        <li style="margin-bottom: 12px;"><strong>Read Carefully:</strong> Go through the entire training module, including all footnotes and explanations.</li>
+                        <li style="margin-bottom: 12px;"><strong>Mobile Users:</strong> Scroll to the bottom of each page to ensure you don’t miss any content or questions.</li>
+                        <li style="margin-bottom: 12px;"><strong>Complete Independently:</strong> This is an individual training module. Please complete it yourself without discussing the questions or answers with others.</li>
+                        <li style="margin-bottom: 12px;"><strong>Answer All Questions:</strong> All questions are mandatory. Read each question carefully and select the most appropriate option.</li>
+                        <li style="margin-bottom: 12px;"><strong>Fill in Your Details:</strong> At the end, complete the Employee Acknowledgement form with accurate details and confirm that you have read and understood the POSH Policy.</li>
+                        <li style="margin-bottom: 12px;"><strong>Complete the Training:</strong> Ensure you finish all sections and reach the final training completion screen.</li>
+                    </ul>
+                    <p style="font-size: 16px; line-height: 1.6; color: #B94124; font-weight: 600; margin-top: 20px;">Please complete the training attentively and independently.</p>
                 </div>
             </div>
 
@@ -1972,7 +1988,7 @@
         }
 
         // Quiz slide indices (0-based)
-        const quizSlides = [7, 10, 15]; // 0-based indices for Slides 8, 11, and 16
+        const quizSlides = [8, 11, 16]; // 0-based indices for Slides 9, 12, and 17 (after the instructions slide)
         // Track option selections for visual feedback
         let optionSelected = {
             'quiz1': false,
@@ -1981,9 +1997,9 @@
         };
         
         let quizAnswered = {}; // Track which quizzes have correct answers
-        let quiz1Attempts = 0; // Track attempts on Slide 8 (Quiz 1)
-        let quiz2Attempts = 0; // Track attempts on Slide 11 (Quiz 2)
-        let quiz3Attempts = 0; // Track attempts on Slide 16 (Quiz 3)
+        let quiz1Attempts = 0; // Track attempts on Slide 9 (Quiz 1)
+        let quiz2Attempts = 0; // Track attempts on Slide 12 (Quiz 2)
+        let quiz3Attempts = 0; // Track attempts on Slide 17 (Quiz 3)
 
         // Update progress bar
         function updateProgress() {
@@ -2148,8 +2164,8 @@
                         }
                     }
                 }
-            } else if (n === 9) {
-                // SLIDE 9: Non-quiz slide - ALWAYS enable next button
+            } else if (n === 10) {
+                // SLIDE 10: Non-quiz slide - ALWAYS enable next button
                 nextBtn.disabled = false;
                 nextBtn.style.opacity = '1';
                 nextBtn.style.cursor = 'pointer';
@@ -2252,16 +2268,16 @@
                                 let redirectMessage = '';
                                 
                                 if (quizId === 'quiz1') {
-                                    // Quiz 1 (Slide 8): Redirect to Slide 0
+                                    // Quiz 1 (Slide 9): Redirect to Slide 0
                                     redirectSlide = 0;
                                     redirectMessage = '⚠️ Please review the training material carefully from the beginning before attempting Quiz 1 again.';
                                 } else if (quizId === 'quiz2') {
-                                    // Quiz 2 (Slide 11): Redirect to Slide 9
-                                    redirectSlide = 9;
+                                    // Quiz 2 (Slide 12): Redirect to Slide 10
+                                    redirectSlide = 10;
                                     redirectMessage = '⚠️ Let\'s review the previous content before attempting Quiz 2 again.';
                                 } else if (quizId === 'quiz3') {
-                                    // Quiz 3 (Slide 16): Redirect to Slide 12
-                                    redirectSlide = 12;
+                                    // Quiz 3 (Slide 17): Redirect to Slide 13
+                                    redirectSlide = 13;
                                     redirectMessage = '⚠️ Let\'s review the previous content before attempting Quiz 3 again.';
                                 }
                                 
@@ -2456,7 +2472,7 @@
             prevBtn.style.display = 'none';
 
             progressFill.style.width = '100%';
-            progressText.textContent = 'Slide 18 of 18 - Complete! ✓';
+            progressText.textContent = `Slide ${totalSlides} of ${totalSlides} - Complete! ✓`;
 
             bgMusic.pause();
         }
